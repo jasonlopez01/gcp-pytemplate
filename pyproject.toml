@@ -1,0 +1,42 @@
+[project]
+name = "gcp-uv-pytemplate"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Jason Lopez", email = "jasonlopez01@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "jinja2>=3.1.0",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "pytest-xdist>=3.8.0",
+    "rich>=14.3.3",
+    "typer>=0.24.1",
+]
+
+[project.scripts]
+gcp-uv-pytemplate = "gcp_uv_pytemplate:main"
+
+[build-system]
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
+
+# Added -n (number of concurrent tests) and --dist=loadscope (load by class) for concurrency with pytest-xdist plugin
+[tool.pytest.ini_options]
+addopts = "--maxfail=1 --verbose -s -n=auto --dist loadscope"
+testpaths = [
+    "tests"
+]
+
+# Omit /builder/* so Coverage doesn't evaluate all installed packages when running on Cloud Build, etc.
+[tool.coverage.run]
+omit = [
+    "/builder/*",
+    "tests/*",
+    "venv/*",
+]
+
+[tool.coverage.report]
+show_missing = true

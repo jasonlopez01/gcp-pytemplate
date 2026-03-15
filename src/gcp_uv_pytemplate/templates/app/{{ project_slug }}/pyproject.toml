@@ -1,0 +1,33 @@
+[project]
+name = "{{ project_slug }}"
+version = "0.1.0"
+description = "{{ project_description }}"
+readme = "README.md"
+authors = [
+    { name = "{{ author_name }}", email = "{{ author_email }}" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+{{ project_slug }} = "{{ project_slug }}:main"
+
+[build-system]
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+addopts = "--maxfail=1 --verbose -s -n=auto --dist loadscope"
+testpaths = [
+    "tests"
+]
+
+[tool.coverage.run]
+omit = [
+    "/builder/*",
+    "tests/*",
+    "venv/*",
+]
+
+[tool.coverage.report]
+show_missing = true
