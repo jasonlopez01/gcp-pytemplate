@@ -1,0 +1,11 @@
+# Example: CLI-only project (Typer + Cloud Run Jobs)
+# Usage: gcp-uv-pytemplate new --from-file examples/cli_project.yaml
+
+project_name: Example CLI Job
+project_description: A Typer CLI application deployed as a Cloud Run Job
+gcp_project: my-gcp-project
+gcp_region: us-west2
+gcp_service_account: my-service-account@my-gcp-project.iam.gserviceaccount.com
+gcp_artifact_repo: demo-images
+interfaces: cli
+deploy_targets: cloud-run-jobs

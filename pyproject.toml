@@ -6,14 +6,20 @@ readme = "README.md"
 authors = [
     { name = "Jason Lopez", email = "jasonlopez01@gmail.com" }
 ]
-requires-python = ">=3.14"
+requires-python = ">=3.13"
 dependencies = [
     "jinja2>=3.1.0",
+    "pyyaml>=6.0.0",
+    "rich>=14.3.3",
+    "typer>=0.24.1",
+]
+
+[dependency-groups]
+dev = [
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
     "pytest-xdist>=3.8.0",
-    "rich>=14.3.3",
-    "typer>=0.24.1",
+    "ruff>=0.11.0",
 ]
 
 [project.scripts]
@@ -36,6 +42,7 @@ omit = [
     "/builder/*",
     "tests/*",
     "venv/*",
+    "examples/*",
 ]
 
 [tool.coverage.report]
