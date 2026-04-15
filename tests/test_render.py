@@ -84,7 +84,12 @@ class TestFileExclusion:
 
     def test_shared_files_always_present(self, tmp_path):
         """Core files are always rendered regardless of flags."""
-        ctx = _context(include_api=False, include_cli=False, include_cloud_run=False, include_cloud_run_jobs=False)
+        ctx = _context(
+            include_api=False,
+            include_cli=False,
+            include_cloud_run=False,
+            include_cloud_run_jobs=False,
+        )
         written = render_service(ctx, tmp_path)
         rel = _rel_paths(written, tmp_path)
 
@@ -188,21 +193,27 @@ class TestMakefileContent:
         assert "execute-job:" in content
 
     def test_api_cloud_run_only(self, tmp_path):
-        content = self._read_makefile(tmp_path, include_cli=False, include_cloud_run_jobs=False)
+        content = self._read_makefile(
+            tmp_path, include_cli=False, include_cloud_run_jobs=False
+        )
         assert "start-api:" in content
         assert "deploy_gcr:" in content
         assert "deploy_gcrj:" not in content
         assert "execute-job:" not in content
 
     def test_cli_cloud_run_jobs_only(self, tmp_path):
-        content = self._read_makefile(tmp_path, include_api=False, include_cloud_run=False)
+        content = self._read_makefile(
+            tmp_path, include_api=False, include_cloud_run=False
+        )
         assert "start-api:" not in content
         assert "deploy_gcr:" not in content
         assert "deploy_gcrj:" in content
         assert "execute-job:" in content
 
     def test_no_deploy_targets(self, tmp_path):
-        content = self._read_makefile(tmp_path, include_cloud_run=False, include_cloud_run_jobs=False)
+        content = self._read_makefile(
+            tmp_path, include_cloud_run=False, include_cloud_run_jobs=False
+        )
         assert "deploy_gcr:" not in content
         assert "deploy_gcrj:" not in content
         assert "execute-job:" not in content
@@ -218,7 +229,9 @@ class TestMakefileContent:
 class TestDeployConfigContent:
     def _read_deploy_config(self, tmp_path, env="local", **overrides):
         render_service(_context(**overrides), tmp_path)
-        return (tmp_path / "my-test-app" / "deploy_configs" / f"{env}.deploy.env").read_text()
+        return (
+            tmp_path / "my-test-app" / "deploy_configs" / f"{env}.deploy.env"
+        ).read_text()
 
     def test_both_targets(self, tmp_path):
         content = self._read_deploy_config(tmp_path)
@@ -236,7 +249,9 @@ class TestDeployConfigContent:
         assert "GCRJ_JOB_NAME" in content
 
     def test_shared_config_always_present(self, tmp_path):
-        content = self._read_deploy_config(tmp_path, include_cloud_run=False, include_cloud_run_jobs=False)
+        content = self._read_deploy_config(
+            tmp_path, include_cloud_run=False, include_cloud_run_jobs=False
+        )
         assert "GCP_PROJECT" in content
         assert "GCP_REGION" in content
         assert "GAR_REPO" in content
@@ -267,7 +282,9 @@ class TestVariableSubstitution:
 
     def test_gcp_values_in_deploy_config(self, tmp_path):
         render_service(_context(), tmp_path)
-        content = (tmp_path / "my-test-app" / "deploy_configs" / "local.deploy.env").read_text()
+        content = (
+            tmp_path / "my-test-app" / "deploy_configs" / "local.deploy.env"
+        ).read_text()
         assert "test-gcp-project" in content
         assert "us-central1" in content
         assert "{{ gcp_project }}" not in content
@@ -279,4 +296,6 @@ class TestVariableSubstitution:
             content = path.read_text()
             # Allow ${...} (shell variables) but flag {{ ... }} (Jinja leftovers)
             if "{{" in content and "}}" in content:
-                pytest.fail(f"Unrendered Jinja variable in {path.name}:\n{content[:200]}")
+                pytest.fail(
+                    f"Unrendered Jinja variable in {path.name}:\n{content[:200]}"
+                )

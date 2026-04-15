@@ -47,3 +47,9 @@ omit = [
 
 [tool.coverage.report]
 show_missing = true
+
+[tool.ruff]
+# Exclude the templates because they aren't valid Python until rendered
+extend-exclude = [
+    "src/gcp_uv_pytemplate/templates/**",
+]

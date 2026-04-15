@@ -1,7 +1,6 @@
 import re
 import subprocess
 from pathlib import Path
-from typing import Optional
 
 import typer
 import yaml
@@ -22,22 +21,26 @@ def slugify(name: str) -> str:
     return slug
 
 
-def _git_config(key: str) -> Optional[str]:
+def _git_config(key: str) -> str | None:
     try:
         result = subprocess.run(
             ["git", "config", key],
-            capture_output=True, text=True, check=True,
+            capture_output=True,
+            text=True,
+            check=True,
         )
         return result.stdout.strip() or None
     except subprocess.CalledProcessError:
         return None
 
 
-def _gcloud_config(key: str) -> Optional[str]:
+def _gcloud_config(key: str) -> str | None:
     try:
         result = subprocess.run(
             ["gcloud", "config", "get", key],
-            capture_output=True, text=True, check=True,
+            capture_output=True,
+            text=True,
+            check=True,
         )
         return result.stdout.strip() or None
     except subprocess.CalledProcessError:
@@ -47,28 +50,59 @@ def _gcloud_config(key: str) -> Optional[str]:
 def _load_yaml(path: Path) -> dict:
     with open(path) as f:
         data = yaml.safe_load(f)
-    required = {"project_name", "project_description", "gcp_project", "gcp_region", "gcp_service_account", "gcp_artifact_repo"}
+    required = {
+        "project_name",
+        "project_description",
+        "gcp_project",
+        "gcp_region",
+        "gcp_service_account",
+        "gcp_artifact_repo",
+    }
     missing = required - data.keys()
     if missing:
-        raise typer.BadParameter(f"Missing required fields in {path.name}: {', '.join(sorted(missing))}")
+        raise typer.BadParameter(
+            f"Missing required fields in {path.name}: {', '.join(sorted(missing))}"
+        )
     # Optional fields: interfaces, deploy_targets
     return data
 
 
 @app.command()
 def new(
-    from_file: Optional[Path] = typer.Option(None, "--from-file", "-f", help="Path to a YAML file with template inputs"),
-    project_name: Optional[str] = typer.Option(None, help="Human-readable project name"),
-    project_description: Optional[str] = typer.Option(None, help="Short project description"),
-    gcp_project: Optional[str] = typer.Option(None, help="GCP project ID (defaults to gcloud config)"),
-    gcp_region: Optional[str] = typer.Option(None, help="GCP region (defaults to gcloud config compute/region)"),
-    gcp_service_account: Optional[str] = typer.Option(None, help="GCP service account email"),
-    gcp_artifact_repo: Optional[str] = typer.Option(None, help="Google Artifact Registry repository name"),
-    author_name: Optional[str] = typer.Option(None, help="Author full name (defaults to git config user.name)"),
-    author_email: Optional[str] = typer.Option(None, help="Author email (defaults to git config user.email)"),
-    interfaces: Optional[str] = typer.Option(None, help="Interfaces to include: api, cli, or both"),
-    deploy_targets: Optional[str] = typer.Option(None, help="Deploy targets: cloud-run, cloud-run-jobs, or both"),
-    output_dir: Path = typer.Option(Path.cwd(), help="Directory to create the project in"),
+    from_file: Path | None = typer.Option(
+        None, "--from-file", "-f", help="Path to a YAML file with template inputs"
+    ),
+    project_name: str | None = typer.Option(None, help="Human-readable project name"),
+    project_description: str | None = typer.Option(
+        None, help="Short project description"
+    ),
+    gcp_project: str | None = typer.Option(
+        None, help="GCP project ID (defaults to gcloud config)"
+    ),
+    gcp_region: str | None = typer.Option(
+        None, help="GCP region (defaults to gcloud config compute/region)"
+    ),
+    gcp_service_account: str | None = typer.Option(
+        None, help="GCP service account email"
+    ),
+    gcp_artifact_repo: str | None = typer.Option(
+        None, help="Google Artifact Registry repository name"
+    ),
+    author_name: str | None = typer.Option(
+        None, help="Author full name (defaults to git config user.name)"
+    ),
+    author_email: str | None = typer.Option(
+        None, help="Author email (defaults to git config user.email)"
+    ),
+    interfaces: str | None = typer.Option(
+        None, help="Interfaces to include: api, cli, or both"
+    ),
+    deploy_targets: str | None = typer.Option(
+        None, help="Deploy targets: cloud-run, cloud-run-jobs, or both"
+    ),
+    output_dir: Path = typer.Option(
+        Path.cwd(), help="Directory to create the project in"
+    ),
 ) -> None:
     """Create a new GCP app project from the template."""
     if from_file:
@@ -89,7 +123,9 @@ def new(
     project_slug = slugify(project_name)
 
     resolved_author_name = author_name or _git_config("user.name") or "Your Name"
-    resolved_author_email = author_email or _git_config("user.email") or "you@example.com"
+    resolved_author_email = (
+        author_email or _git_config("user.email") or "you@example.com"
+    )
 
     resolved_gcp_project = gcp_project or typer.prompt(
         "GCP project", default=_gcloud_config("project") or ""
@@ -101,7 +137,9 @@ def new(
         "GCP service account email",
         default=f"placeholder@{resolved_gcp_project}.iam.gserviceaccount.com",
     )
-    resolved_gcp_artifact_repo = gcp_artifact_repo or typer.prompt("Artifact Registry repository name")
+    resolved_gcp_artifact_repo = gcp_artifact_repo or typer.prompt(
+        "Artifact Registry repository name"
+    )
 
     # ── Interfaces & deploy targets ──────────────────────────────────────────
     INTERFACE_CHOICES = ["api", "cli", "both"]
@@ -113,7 +151,9 @@ def new(
     )
     interfaces = interfaces.strip().lower()
     if interfaces not in INTERFACE_CHOICES:
-        raise typer.BadParameter(f"Invalid interface: {interfaces}. Choose from: {', '.join(INTERFACE_CHOICES)}")
+        raise typer.BadParameter(
+            f"Invalid interface: {interfaces}. Choose from: {', '.join(INTERFACE_CHOICES)}"
+        )
 
     deploy_targets = deploy_targets or typer.prompt(
         "Deploy targets (cloud-run, cloud-run-jobs, both)",
@@ -121,14 +161,20 @@ def new(
     )
     deploy_targets = deploy_targets.strip().lower()
     if deploy_targets not in DEPLOY_TARGET_CHOICES:
-        raise typer.BadParameter(f"Invalid deploy target: {deploy_targets}. Choose from: {', '.join(DEPLOY_TARGET_CHOICES)}")
+        raise typer.BadParameter(
+            f"Invalid deploy target: {deploy_targets}. Choose from: {', '.join(DEPLOY_TARGET_CHOICES)}"
+        )
 
     # Override interfaces based on deploy targets
     if deploy_targets == "cloud-run" and interfaces == "cli":
-        console.print("[yellow]Cloud Run requires the API interface — adding it.[/yellow]")
+        console.print(
+            "[yellow]Cloud Run requires the API interface — adding it.[/yellow]"
+        )
         interfaces = "both"
     if deploy_targets == "cloud-run-jobs" and interfaces == "api":
-        console.print("[yellow]Cloud Run Jobs requires the CLI interface — adding it.[/yellow]")
+        console.print(
+            "[yellow]Cloud Run Jobs requires the CLI interface — adding it.[/yellow]"
+        )
         interfaces = "both"
 
     # Compute boolean flags
@@ -166,7 +212,9 @@ def new(
             console.print("[yellow]Aborted.[/yellow]")
             raise typer.Exit()
 
-    console.print(f"\n[bold]Creating[/bold] [cyan]{project_name}[/cyan] → [green]{project_slug}[/green]")
+    console.print(
+        f"\n[bold]Creating[/bold] [cyan]{project_name}[/cyan] → [green]{project_slug}[/green]"
+    )
 
     written = render_service(context, output_dir)
 
@@ -184,14 +232,18 @@ def new(
         "deploy_targets": deploy_targets,
     }
     inputs_path = project_root / ".gcp-uv-pytemplate.yaml"
-    inputs_path.write_text(yaml.dump(template_inputs, default_flow_style=False, sort_keys=False))
+    inputs_path.write_text(
+        yaml.dump(template_inputs, default_flow_style=False, sort_keys=False)
+    )
     written.append(inputs_path)
 
     tree = Tree(f"[green]{project_slug}/[/green]")
     _build_tree(tree, project_root, written)
     console.print(tree)
 
-    console.print(f"\n[bold green]Done![/bold green] Project created at [cyan]{project_root}[/cyan]")
+    console.print(
+        f"\n[bold green]Done![/bold green] Project created at [cyan]{project_root}[/cyan]"
+    )
 
 
 def _build_tree(branch: Tree, directory: Path, written: list[Path]) -> None:
