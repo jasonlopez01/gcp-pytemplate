@@ -1,0 +1,52 @@
+.PHONY: setup lint test execute-job deploy_gcrj help
+
+# ── Help ──────────────────────────────────────────────────────────────────────
+
+help: ## Show available commands
+	@grep -E '^[a-zA-Z_-]+:.*##' Makefile | awk -F ':.*##' '{printf "  %-15s %s\n", $$1, $$2}'
+
+# ── Setup ─────────────────────────────────────────────────────────────────────
+
+setup: ## Install dependencies
+	uv sync --group dev
+
+
+# ── Lint ──────────────────────────────────────────────────────────────────────
+
+lint: ## Lint and format with ruff
+	uv run ruff check --fix .
+	uv run ruff format .
+
+# ── Test ──────────────────────────────────────────────────────────────────────
+
+test: ## Run tests
+	uv run pytest
+
+
+# ── Deploy ────────────────────────────────────────────────────────────────────
+
+
+# Usage:
+#   make execute-job DEPLOY_CONFIG=prod.deploy.env [ARGS="items"]
+
+execute-job: ## Execute an existing Cloud Run Job (DEPLOY_CONFIG=<file> [ARGS="<cli args>"])
+ifndef DEPLOY_CONFIG
+	$(error DEPLOY_CONFIG is required. Usage: make execute-job DEPLOY_CONFIG=prod.deploy.env)
+endif
+	bash ./scripts/execute_cloud_run_job.sh $(DEPLOY_CONFIG) $(ARGS)
+
+
+
+
+# Usage:
+#   make deploy_gcrj DEPLOY_CONFIG=prod.deploy.env APP_CONFIG=prod.env
+deploy_gcrj: ## Deploy to Cloud Run Job (DEPLOY_CONFIG=<file> APP_CONFIG=<file>)
+ifndef DEPLOY_CONFIG
+	$(error DEPLOY_CONFIG is required. Usage: make deploy_gcrj DEPLOY_CONFIG=prod.deploy.env APP_CONFIG=prod.env)
+endif
+ifndef APP_CONFIG
+	$(error APP_CONFIG is required. Usage: make deploy_gcrj DEPLOY_CONFIG=prod.deploy.env APP_CONFIG=prod.env)
+endif
+	bash ./scripts/deploy_cloud_run_job.sh $(DEPLOY_CONFIG) $(APP_CONFIG)
+
+

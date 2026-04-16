@@ -41,6 +41,6 @@ endif
 generate-examples: ## (Re)generate example projects from YAML files in examples/
 	@for f in examples/*.yaml; do \
 		echo "Generating from $$f ..."; \
-		uv run gcp-uv-pytemplate new --from-file "$$f" --output-dir examples/; \
+		uv run gcp-uv-pytemplate --from-file "$$f" --output-dir examples/; \
 		echo ""; \
 	done
