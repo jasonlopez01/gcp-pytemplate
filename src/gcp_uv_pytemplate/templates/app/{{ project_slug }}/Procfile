@@ -1,6 +1,10 @@
 {%- if include_api %}
 web: uvicorn {{ project_module }}.main_api:app --host 0.0.0.0 --port $PORT --workers 1 --proxy-headers --forwarded-allow-ips='*'
+{%- elif include_cli %}
+# Fallback 'web' process to satisfy Google Cloud Buildpacks for CLI-only projects
+web: {{ project_slug }} ${CLI_ARGS:-}
 {%- endif %}
+
 {%- if include_cli %}
 # CLI_ARGS is set at execution time by execute_cloud_run_job.sh
 job: {{ project_slug }} ${CLI_ARGS:-}
