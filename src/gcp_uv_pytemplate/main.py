@@ -1,7 +1,10 @@
 import re
+import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
+import questionary
 import typer
 import yaml
 from rich.console import Console
@@ -11,6 +14,25 @@ from gcp_uv_pytemplate.render import render_service
 
 app = typer.Typer()
 console = Console()
+
+UPDATABLE_COMPONENTS: dict[str, list[str]] = {
+    "cache": [
+        "src/{project_module}/utils/cache.py",
+        "tests/unit/test_cache.py",
+    ],
+    "gcp_auth": [
+        "src/{project_module}/utils/gcp_auth/",
+    ],
+    "logging_config": [
+        "src/{project_module}/config/logging_config.py",
+    ],
+}
+
+_COMPONENT_LABELS = {
+    "cache": "utils/cache.py + tests/unit/test_cache.py",
+    "gcp_auth": "utils/gcp_auth/",
+    "logging_config": "config/logging_config.py",
+}
 
 
 def slugify(name: str) -> str:
@@ -63,8 +85,87 @@ def _load_yaml(path: Path) -> dict:
         raise typer.BadParameter(
             f"Missing required fields in {path.name}: {', '.join(sorted(missing))}"
         )
-    # Optional fields: interfaces, deploy_targets
     return data
+
+
+def _build_context(data: dict) -> dict:
+    """Build the full Jinja2 render context from a parsed YAML inputs dict."""
+    project_name = data["project_name"]
+    project_slug = slugify(project_name)
+    project_module = project_slug.replace("-", "_")
+
+    interfaces = data.get("interfaces", "both").strip().lower()
+    deploy_targets = data.get("deploy_targets", "both").strip().lower()
+
+    include_api = interfaces in ("api", "both")
+    include_cli = interfaces in ("cli", "both")
+    include_cloud_run = deploy_targets in ("cloud-run", "both")
+    include_cloud_run_jobs = deploy_targets in ("cloud-run-jobs", "both")
+
+    return {
+        "project_name": project_name,
+        "project_slug": project_slug,
+        "project_module": project_module,
+        "project_description": data["project_description"],
+        "gcp_project": data["gcp_project"],
+        "gcp_region": data["gcp_region"],
+        "gcp_service_account": data["gcp_service_account"],
+        "gcp_artifact_repo": data["gcp_artifact_repo"],
+        "author_name": data.get("author_name", ""),
+        "author_email": data.get("author_email", ""),
+        "include_api": include_api,
+        "include_cli": include_cli,
+        "include_cloud_run": include_cloud_run,
+        "include_cloud_run_jobs": include_cloud_run_jobs,
+    }
+
+
+def _resolve_component_paths(component_names: list[str], project_module: str) -> list[str]:
+    """Resolve component names to template-relative path strings."""
+    paths: list[str] = []
+    for name in component_names:
+        for fragment in UPDATABLE_COMPONENTS[name]:
+            paths.append(fragment.format(project_module=project_module))
+    return paths
+
+
+def _copy_from_temp(
+    temp_project_root: Path,
+    dest_project_root: Path,
+    rel_paths: list[str],
+) -> list[Path]:
+    """Copy files/dirs from the rendered temp project into the real project.
+
+    Returns list of destination paths that were written.
+    """
+    written: list[Path] = []
+
+    for rel in rel_paths:
+        src = temp_project_root / rel
+        dest = dest_project_root / rel
+
+        if rel.endswith("/"):
+            # Directory: copy all files recursively
+            if not src.is_dir():
+                console.print(f"[yellow]Warning: expected directory not found in template: {rel}[/yellow]")
+                continue
+            for src_file in sorted(src.rglob("*")):
+                if src_file.is_dir():
+                    continue
+                file_rel = src_file.relative_to(src)
+                dest_file = dest / file_rel
+                dest_file.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src_file, dest_file)
+                written.append(dest_file)
+        else:
+            if not src.is_file():
+                console.print(f"[yellow]Warning: expected file not found in template: {rel}[/yellow]")
+                continue
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dest)
+            written.append(dest)
+
+    return written
 
 
 @app.command()
@@ -141,31 +242,20 @@ def new(
         "Artifact Registry repository name"
     )
 
-    # ── Interfaces & deploy targets ──────────────────────────────────────────
-    INTERFACE_CHOICES = ["api", "cli", "both"]
-    DEPLOY_TARGET_CHOICES = ["cloud-run", "cloud-run-jobs", "both"]
+    if not interfaces:
+        interfaces = questionary.select(
+            "Interfaces:",
+            choices=["both", "api", "cli"],
+            default="both",
+        ).ask()
 
-    interfaces = interfaces or typer.prompt(
-        "Interfaces (api, cli, both)",
-        default="both",
-    )
-    interfaces = interfaces.strip().lower()
-    if interfaces not in INTERFACE_CHOICES:
-        raise typer.BadParameter(
-            f"Invalid interface: {interfaces}. Choose from: {', '.join(INTERFACE_CHOICES)}"
-        )
+    if not deploy_targets:
+        deploy_targets = questionary.select(
+            "Deploy targets:",
+            choices=["both", "cloud-run", "cloud-run-jobs"],
+            default="both",
+        ).ask()
 
-    deploy_targets = deploy_targets or typer.prompt(
-        "Deploy targets (cloud-run, cloud-run-jobs, both)",
-        default="both",
-    )
-    deploy_targets = deploy_targets.strip().lower()
-    if deploy_targets not in DEPLOY_TARGET_CHOICES:
-        raise typer.BadParameter(
-            f"Invalid deploy target: {deploy_targets}. Choose from: {', '.join(DEPLOY_TARGET_CHOICES)}"
-        )
-
-    # Override interfaces based on deploy targets
     if deploy_targets == "cloud-run" and interfaces == "cli":
         console.print(
             "[yellow]Cloud Run requires the API interface — adding it.[/yellow]"
@@ -177,18 +267,8 @@ def new(
         )
         interfaces = "both"
 
-    # Compute boolean flags
-    include_api = interfaces in ("api", "both")
-    include_cli = interfaces in ("cli", "both")
-    include_cloud_run = deploy_targets in ("cloud-run", "both")
-    include_cloud_run_jobs = deploy_targets in ("cloud-run-jobs", "both")
-
-    project_module = project_slug.replace("-", "_")
-
-    context = {
+    context = _build_context({
         "project_name": project_name,
-        "project_slug": project_slug,
-        "project_module": project_module,
         "project_description": project_description,
         "gcp_project": resolved_gcp_project,
         "gcp_region": resolved_gcp_region,
@@ -196,18 +276,16 @@ def new(
         "gcp_artifact_repo": resolved_gcp_artifact_repo,
         "author_name": resolved_author_name,
         "author_email": resolved_author_email,
-        "include_api": include_api,
-        "include_cli": include_cli,
-        "include_cloud_run": include_cloud_run,
-        "include_cloud_run_jobs": include_cloud_run_jobs,
-    }
+        "interfaces": interfaces,
+        "deploy_targets": deploy_targets,
+    })
 
     project_root = output_dir / project_slug
     if project_root.exists():
-        overwrite = typer.confirm(
+        overwrite = questionary.confirm(
             f"Directory '{project_slug}' already exists. Overwrite?",
             default=False,
-        )
+        ).ask()
         if not overwrite:
             console.print("[yellow]Aborted.[/yellow]")
             raise typer.Exit()
@@ -218,7 +296,6 @@ def new(
 
     written = render_service(context, output_dir)
 
-    # Save inputs so the project can be regenerated
     template_inputs = {
         "project_name": project_name,
         "project_description": project_description,
@@ -244,6 +321,86 @@ def new(
     console.print(
         f"\n[bold green]Done![/bold green] Project created at [cyan]{project_root}[/cyan]"
     )
+
+
+@app.command()
+def update(
+    project_path: Path = typer.Argument(
+        ..., help="Path to an existing generated project"
+    ),
+    components: str | None = typer.Option(
+        None,
+        help=f"Comma-separated components to update: {', '.join(UPDATABLE_COMPONENTS)}",
+    ),
+    files: str | None = typer.Option(
+        None,
+        help="Comma-separated file/folder paths relative to the project root to update",
+    ),
+) -> None:
+    """Update components of an existing project from the latest template."""
+    inputs_file = project_path / ".gcp-uv-pytemplate.yaml"
+    if not project_path.is_dir():
+        console.print(f"[red]Error: '{project_path}' is not a directory.[/red]")
+        raise typer.Exit(1)
+    if not inputs_file.exists():
+        console.print(
+            f"[red]Error: '{inputs_file}' not found. Is this a gcp-uv-pytemplate project?[/red]"
+        )
+        raise typer.Exit(1)
+
+    data = _load_yaml(inputs_file)
+    context = _build_context(data)
+    project_module = context["project_module"]
+    project_slug = context["project_slug"]
+
+    # Determine which relative paths to update
+    rel_paths: list[str]
+
+    if files:
+        rel_paths = [f.strip() for f in files.split(",") if f.strip()]
+    elif components:
+        component_names = [c.strip() for c in components.split(",") if c.strip()]
+        invalid = [c for c in component_names if c not in UPDATABLE_COMPONENTS]
+        if invalid:
+            console.print(
+                f"[red]Unknown components: {', '.join(invalid)}. "
+                f"Available: {', '.join(UPDATABLE_COMPONENTS)}[/red]"
+            )
+            raise typer.Exit(1)
+        rel_paths = _resolve_component_paths(component_names, project_module)
+    else:
+        choices = [
+            questionary.Choice(
+                title=f"{name}  ({label})",
+                value=name,
+            )
+            for name, label in _COMPONENT_LABELS.items()
+        ]
+        selected: list[str] = questionary.checkbox(
+            "Select components to update:",
+            choices=choices,
+        ).ask()
+
+        if not selected:
+            console.print("[yellow]No components selected. Aborted.[/yellow]")
+            raise typer.Exit()
+
+        rel_paths = _resolve_component_paths(selected, project_module)
+
+    console.print(f"\n[bold]Updating[/bold] [cyan]{project_slug}[/cyan] at [green]{project_path}[/green]")
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        render_service(context, Path(tmp_dir))
+        temp_project_root = Path(tmp_dir) / project_slug
+        written = _copy_from_temp(temp_project_root, project_path, rel_paths)
+
+    if written:
+        console.print("\nUpdated files:")
+        for path in written:
+            console.print(f"  [green]{path.relative_to(project_path)}[/green]")
+        console.print(f"\n[bold green]Done![/bold green] {len(written)} file(s) updated.")
+    else:
+        console.print("[yellow]No files were updated.[/yellow]")
 
 
 def _build_tree(branch: Tree, directory: Path, written: list[Path]) -> None:

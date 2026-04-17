@@ -3,15 +3,15 @@
 # Deploy {{ project_name }} to Cloud Run using Google Cloud Buildpacks (Procfile).
 #
 # Usage:
-#   ./scripts/deploy_cloud_run.sh <deploy_env_file> <app_env_file>
+#   ./scripts/deploy_cloud_run.sh <deploy_env_file>
 #
 # Examples:
-#   ./scripts/deploy_cloud_run.sh prod.deploy.env prod.env
-#   ./scripts/deploy_cloud_run.sh prod.mega_deploy.env prod.env
+#   ./scripts/deploy_cloud_run.sh prod.deploy.env
+#   ./scripts/deploy_cloud_run.sh prod.mega_deploy.env
 #
 # Requirements:
 #   - gcloud CLI installed and authenticated
-#   - Deploy config file present in deploy_configs/
+#   - Deploy config file present in deploy_configs/ (must define APP_CONFIG)
 #   - App config file present in config/app_configs/
 
 set -euo pipefail
@@ -19,12 +19,11 @@ set -euo pipefail
 # ── Args ──────────────────────────────────────────────────────────────────────
 
 DEPLOY_ENV_FILENAME=${1:-}
-APP_ENV_FILENAME=${2:-}
 
-if [[ -z "${DEPLOY_ENV_FILENAME}" || -z "${APP_ENV_FILENAME}" ]]; then
-    echo "Error: both arguments required."
-    echo "Usage: $0 <deploy_env_file> <app_env_file>"
-    echo "Example: $0 prod.deploy.env prod.env"
+if [[ -z "${DEPLOY_ENV_FILENAME}" ]]; then
+    echo "Error: deploy config file required."
+    echo "Usage: $0 <deploy_env_file>"
+    echo "Example: $0 prod.deploy.env"
     exit 1
 fi
 
@@ -45,6 +44,15 @@ fi
 
 echo "Loading deploy config: ${DEPLOY_ENV_FILE}"
 source "${DEPLOY_ENV_FILE}"
+
+# ── Validate APP_CONFIG ───────────────────────────────────────────────────────
+
+if [[ -z "${APP_CONFIG:-}" ]]; then
+    echo "Error: APP_CONFIG is not set in ${DEPLOY_ENV_FILE}"
+    exit 1
+fi
+
+APP_ENV_FILENAME="${APP_CONFIG}"
 
 # ── Apply defaults for optional config values ─────────────────────────────────
 

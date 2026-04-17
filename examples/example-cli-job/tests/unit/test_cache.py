@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
 from example_cli_job.utils.cache import make_hashable, timed_lru_cache
@@ -40,7 +40,7 @@ class TestTimedLruCache:
             call_count += 1
             return x * 2
 
-        now = datetime.now(UTC)
+        now = datetime.now(timezone.utc)
 
         with patch("example_cli_job.utils.cache.datetime") as mock_dt:
             mock_dt.now.return_value = now

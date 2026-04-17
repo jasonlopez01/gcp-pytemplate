@@ -173,7 +173,7 @@ class TestProcfileContent:
 
     def test_cli_only(self, tmp_path):
         content = self._read_procfile(tmp_path, include_api=False)
-        assert "web:" not in content
+        assert "web:" in content  # needed as a placeholder for GCP Buildpacks
         assert "job:" in content
 
 

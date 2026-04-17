@@ -23,7 +23,7 @@ Run `make help` to see all available commands:
   lint            Lint and format with ruff
   test            Run tests
   execute-job     Execute an existing Cloud Run Job (DEPLOY_CONFIG=<file> [ARGS="<cli args>"])
-  deploy_gcrj     Deploy to Cloud Run Job (DEPLOY_CONFIG=<file> APP_CONFIG=<file>)
+  deploy_gcrj     Deploy to Cloud Run Job (DEPLOY_CONFIG=<file>)
 ```
 
 ## Interface

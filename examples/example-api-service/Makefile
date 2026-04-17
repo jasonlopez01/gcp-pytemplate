@@ -40,15 +40,12 @@ test: ## Run tests
 
 
 # Usage:
-#   make deploy_gcr  DEPLOY_CONFIG=prod.deploy.env APP_CONFIG=prod.env
-deploy_gcr: ## Deploy to Cloud Run service (DEPLOY_CONFIG=<file> APP_CONFIG=<file>)
+#   make deploy_gcr DEPLOY_CONFIG=prod.deploy.env
+deploy_gcr: ## Deploy to Cloud Run service (DEPLOY_CONFIG=<file>)
 ifndef DEPLOY_CONFIG
-	$(error DEPLOY_CONFIG is required. Usage: make deploy_gcr DEPLOY_CONFIG=prod.deploy.env APP_CONFIG=prod.env)
+	$(error DEPLOY_CONFIG is required. Usage: make deploy_gcr DEPLOY_CONFIG=prod.deploy.env)
 endif
-ifndef APP_CONFIG
-	$(error APP_CONFIG is required. Usage: make deploy_gcr DEPLOY_CONFIG=prod.deploy.env APP_CONFIG=prod.env)
-endif
-	bash ./scripts/deploy_cloud_run.sh $(DEPLOY_CONFIG) $(APP_CONFIG)
+	bash ./scripts/deploy_cloud_run.sh $(DEPLOY_CONFIG)
 
 
 

@@ -29,10 +29,10 @@ Run `make help` to see all available commands:
   execute-job     Execute an existing Cloud Run Job (DEPLOY_CONFIG=<file> [ARGS="<cli args>"])
 {%- endif %}
 {%- if include_cloud_run %}
-  deploy_gcr      Deploy to Cloud Run service (DEPLOY_CONFIG=<file> APP_CONFIG=<file>)
+  deploy_gcr      Deploy to Cloud Run service (DEPLOY_CONFIG=<file>)
 {%- endif %}
 {%- if include_cloud_run_jobs %}
-  deploy_gcrj     Deploy to Cloud Run Job (DEPLOY_CONFIG=<file> APP_CONFIG=<file>)
+  deploy_gcrj     Deploy to Cloud Run Job (DEPLOY_CONFIG=<file>)
 {%- endif %}
 ```
 {% if include_api and include_cli %}

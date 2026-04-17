@@ -1,5 +1,5 @@
+
 # Fallback 'web' process to satisfy Google Cloud Buildpacks for CLI-only projects
 web: example-cli-job ${CLI_ARGS:-}
-
 # CLI_ARGS is set at execution time by execute_cloud_run_job.sh
 job: example-cli-job ${CLI_ARGS:-}

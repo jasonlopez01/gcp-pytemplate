@@ -23,7 +23,7 @@ Run `make help` to see all available commands:
   lint            Lint and format with ruff
   test            Run tests
   start-api       Start the FastAPI server locally (APP_CONFIG=local.env)
-  deploy_gcr      Deploy to Cloud Run service (DEPLOY_CONFIG=<file> APP_CONFIG=<file>)
+  deploy_gcr      Deploy to Cloud Run service (DEPLOY_CONFIG=<file>)
 ```
 
 ## Interface
