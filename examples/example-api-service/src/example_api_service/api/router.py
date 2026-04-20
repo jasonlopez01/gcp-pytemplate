@@ -1,29 +1,38 @@
+from datetime import datetime
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from example_api_service.app.items import Item, get_item, list_items
-
-router = APIRouter(prefix="/items", tags=["items"])
+from example_api_service.app.models import ExampleModel, fetch_examples, fetch_example
 
 
-class ItemResponse(BaseModel):
-    id: int
+router = APIRouter(prefix="/api", tags=["api", "examples"])
+
+
+class ExampleResponse(BaseModel):
+    id: str
     name: str
-    description: str
+    email: str
+    created_at: datetime
+    updated_at: datetime | None
 
     @classmethod
-    def from_item(cls, item: Item) -> "ItemResponse":
-        return cls(id=item.id, name=item.name, description=item.description)
+    def from_example(cls, example: ExampleModel) -> "ExampleResponse":
+        exclude_keys = ["ex_bool"]
+        raw_values = example.model_dump()
+        raw_values["email"] = "******"
+        raw_values["id"] = str(raw_values["id"])
+        resp_values = {k:v for k,v in raw_values.items() if k not in exclude_keys}
+        return cls(**resp_values)
 
 
-@router.get("/", response_model=list[ItemResponse])
-def get_items() -> list[ItemResponse]:
-    return [ItemResponse.from_item(i) for i in list_items()]
+@router.get("/list", response_model=list[ExampleResponse])
+def get_items() -> list[ExampleResponse]:
+    return [ExampleResponse.from_example(i) for i in fetch_examples()]
 
 
-@router.get("/{item_id}", response_model=ItemResponse)
-def get_item_by_id(item_id: int) -> ItemResponse:
-    item = get_item(item_id)
-    if not item:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return ItemResponse.from_item(item)
+@router.get("/{ex_id}", response_model=ExampleResponse)
+def get_ex_by_id(ex_id: str) -> ExampleResponse:
+    ex = fetch_example(ex_id)
+    if not ex:
+        raise HTTPException(status_code=404, detail="Example not found")
+    return ExampleResponse.from_example(ex)

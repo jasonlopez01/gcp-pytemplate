@@ -2,26 +2,28 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from {{ project_module }}.app.items import get_item, list_items
+from {{ project_module }}.app.models import ExampleModel, fetch_examples, fetch_example
 
 app = typer.Typer(no_args_is_help=True)
 console = Console()
 
 
 @app.command()
-def items() -> None:
-    """List all items."""
-    table = Table("ID", "Name", "Description")
-    for item in list_items():
-        table.add_row(str(item.id), item.name, item.description)
+def list_examples() -> None:
+    """List all examples."""
+    field_names = [x.capitalize() for x in ExampleModel.model_fields.keys()]
+    table = Table(*field_names)
+    for ex in fetch_examples():
+        ex_values = [str(x) for x in ex.model_dump().values()]
+        table.add_row(*ex_values)
     console.print(table)
 
 
 @app.command()
-def item(item_id: int = typer.Argument(..., help="Item ID to fetch")) -> None:
-    """Get a single item by ID."""
-    result = get_item(item_id)
+def get_example(id: str = typer.Argument(help="Example ID to fetch")) -> None:
+    """Get a single example by ID."""
+    result = fetch_example(id=id)
     if not result:
-        console.print(f"[red]Item {item_id} not found.[/red]")
+        console.print(f"[red]Example {id} not found.[/red]")
         raise typer.Exit(code=1)
-    console.print(f"[bold]{result.id}[/bold] — {result.name}: {result.description}")
+    console.print(f"[bold]{result.id}[/bold] — {result.name} ({result.email})")

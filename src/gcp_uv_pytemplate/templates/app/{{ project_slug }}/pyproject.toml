@@ -23,7 +23,7 @@ dependencies = [
     "typer>=0.24.1",
 {%- endif %}
     "google-auth>=2.40.0",
-    "pydantic>=2.12.5",
+    "pydantic[email]>=2.12.5",
     "pydantic-settings>=2.13.1",
     "requests>=2.32.0",
     "rich>=14.3.3",
@@ -36,6 +36,9 @@ dev = [
     "pytest-cov>=7.0.0",
     "pytest-xdist>=3.8.0",
     "ruff>=0.11.0",
+{%- if include_api %}
+    "httpx>=0.27.0",
+{%- endif %}
 ]
 
 {%- if include_cli %}

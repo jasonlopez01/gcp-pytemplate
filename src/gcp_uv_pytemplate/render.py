@@ -9,8 +9,10 @@ import jinja2
 _EXCLUSION_RULES = [
     ("src/{{ project_module }}/api/", "include_api"),
     ("src/{{ project_module }}/main_api.py", "include_api"),
+    ("tests/unit/test_base_api.py", "include_api"),
     ("src/{{ project_module }}/cli/", "include_cli"),
     ("src/{{ project_module }}/main_cli.py", "include_cli"),
+    ("tests/unit/test_base_cli.py", "include_cli"),
     ("scripts/deploy_cloud_run.sh", "include_cloud_run"),
     ("scripts/deploy_cloud_run_job.sh", "include_cloud_run_jobs"),
     ("scripts/execute_cloud_run_job.sh", "include_cloud_run_jobs"),

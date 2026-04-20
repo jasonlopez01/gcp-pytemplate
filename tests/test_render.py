@@ -134,7 +134,7 @@ class TestPyprojectContent:
 
     def test_shared_deps_always_present(self, tmp_path):
         content = self._read_pyproject(tmp_path, include_api=False, include_cli=False)
-        assert '"pydantic>=' in content
+        assert '"pydantic[email]>=' in content
         assert '"pydantic-settings>=' in content
         assert '"rich>=' in content
         assert '"structlog>=' in content
