@@ -289,6 +289,7 @@ def new(
         if not overwrite:
             console.print("[yellow]Aborted.[/yellow]")
             raise typer.Exit()
+        shutil.rmtree(project_root)
 
     console.print(
         f"\n[bold]Creating[/bold] [cyan]{project_name}[/cyan] → [green]{project_slug}[/green]"
