@@ -47,7 +47,7 @@ example-api-service/
 │   ├── api/
 │   │   └── router.py
 │   ├── app/                 # Core business logic
-│   │   └── items.py
+│   │   └── models.py
 │   └── config/              # App and environment config
 │       ├── app_config.py
 │       ├── gcp_env.py

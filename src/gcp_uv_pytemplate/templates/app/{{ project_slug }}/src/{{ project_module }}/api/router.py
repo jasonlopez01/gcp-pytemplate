@@ -26,7 +26,7 @@ class ExampleResponse(BaseModel):
 
 
 @router.get("/list", response_model=list[ExampleResponse])
-def get_items() -> list[ExampleResponse]:
+def get_examples() -> list[ExampleResponse]:
     return [ExampleResponse.from_example(i) for i in fetch_examples()]
 
 

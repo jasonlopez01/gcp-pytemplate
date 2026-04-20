@@ -83,7 +83,7 @@ This project includes a **Typer** CLI application for Cloud Run Jobs (`src/{{ pr
 │   │   └── commands.py
 {%- endif %}
 │   ├── app/                 # Core business logic
-│   │   └── items.py
+│   │   └── models.py
 │   └── config/              # App and environment config
 │       ├── app_config.py
 │       ├── gcp_env.py
