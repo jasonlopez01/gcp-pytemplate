@@ -36,6 +36,7 @@ Run `make help` to see all available commands:
 {%- endif %}
 ```
 {% if include_api and include_cli %}
+
 ## Interfaces
 
 This project includes two interfaces:
@@ -103,7 +104,7 @@ This project uses two layers of configuration files:
 - **App configs** (`src/{{ project_module }}/config/app_configs/*.env`) — Application-level settings (feature flags, external service URLs, etc.) loaded at runtime via `APP_CONFIG_FILE`.
 - **Deploy configs** (`deploy_configs/*.deploy.env`) — Infrastructure and deployment settings (GCP project, region, resource limits, etc.) used by the deployment scripts.
 
-Both have per-environment variants: `local`, `dev`, `stage`, and `prod`.
+Both have per-environment variants: `local`, `stage`, and `prod`.
 
 ### Why aren't the .env files gitignored?
 
@@ -111,4 +112,4 @@ This project takes the opinion that `.env` files are useful for service configur
 
 Any secrets needed should be managed via a secret manager (e.g., GCP Secret Manager) and fetched at runtime, rather than stored in static configuration files. Instead of specifying an API key or database password in a `.env` file, specify the secret's URI, ID, or resource path so it can be securely fetched at runtime.
 
-If secrets in a local file are needed, a gitignored file like `secrets.env` or `secrets.local.env` could be added.
+If secrets in a local file are needed, a gitignored file like `secrets.env` or `secrets.prod.env` could be added.
