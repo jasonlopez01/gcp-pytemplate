@@ -56,8 +56,6 @@ This project includes a **Typer** CLI application for Cloud Run Jobs (`src/{{ pr
 ```
 {{ project_slug }}/
 ├── deploy_configs/          # Per-environment deploy settings
-│   ├── local.deploy.env
-│   ├── dev.deploy.env
 │   ├── stage.deploy.env
 │   └── prod.deploy.env
 {%- if include_cloud_run or include_cloud_run_jobs %}
@@ -90,7 +88,6 @@ This project includes a **Typer** CLI application for Cloud Run Jobs (`src/{{ pr
 │       ├── logging_config.py
 │       └── app_configs/
 │           ├── local.env
-│           ├── dev.env
 │           ├── stage.env
 │           └── prod.env
 ├── tests/

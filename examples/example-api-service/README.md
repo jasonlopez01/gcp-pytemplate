@@ -35,8 +35,6 @@ This project includes a **FastAPI** application served via Cloud Run (`src/examp
 ```
 example-api-service/
 ├── deploy_configs/          # Per-environment deploy settings
-│   ├── local.deploy.env
-│   ├── dev.deploy.env
 │   ├── stage.deploy.env
 │   └── prod.deploy.env
 ├── scripts/                 # Deployment scripts
@@ -54,7 +52,6 @@ example-api-service/
 │       ├── logging_config.py
 │       └── app_configs/
 │           ├── local.env
-│           ├── dev.env
 │           ├── stage.env
 │           └── prod.env
 ├── tests/

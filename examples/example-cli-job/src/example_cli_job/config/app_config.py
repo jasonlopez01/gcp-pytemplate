@@ -48,7 +48,13 @@ if "APP_CONFIG_FILE" not in os.environ:
         "Missing environment variable APP_CONFIG_FILE. Set it to a filename in config/app_configs/, e.g. export APP_CONFIG_FILE=local.env"
     )
 
-APP_CONFIG_FILE = os.path.join(CONFIG_ROOT_DIR, "app_configs", os.environ["APP_CONFIG_FILE"])
+_config_filename = os.path.basename(os.environ["APP_CONFIG_FILE"])
+if _config_filename != os.environ["APP_CONFIG_FILE"].strip():
+    raise ValueError(
+        f"APP_CONFIG_FILE must be a plain filename with no path components, got: {os.environ['APP_CONFIG_FILE']!r}"
+    )
+
+APP_CONFIG_FILE = os.path.join(CONFIG_ROOT_DIR, "app_configs", _config_filename)
 
 if not os.path.isfile(APP_CONFIG_FILE):
     raise FileNotFoundError(f"App config file was not found at {APP_CONFIG_FILE}")

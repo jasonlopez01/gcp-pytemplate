@@ -35,8 +35,6 @@ This project includes a **Typer** CLI application for Cloud Run Jobs (`src/examp
 ```
 example-cli-job/
 ├── deploy_configs/          # Per-environment deploy settings
-│   ├── local.deploy.env
-│   ├── dev.deploy.env
 │   ├── stage.deploy.env
 │   └── prod.deploy.env
 ├── scripts/                 # Deployment scripts
@@ -55,7 +53,6 @@ example-cli-job/
 │       ├── logging_config.py
 │       └── app_configs/
 │           ├── local.env
-│           ├── dev.env
 │           ├── stage.env
 │           └── prod.env
 ├── tests/

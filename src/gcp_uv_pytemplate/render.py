@@ -56,7 +56,10 @@ def render_service(context: dict, output_dir: Path) -> list[Path]:
             dest_path = output_dir / context["project_slug"] / rendered_rel
             dest_path.parent.mkdir(parents=True, exist_ok=True)
 
-            rendered_content = jinja2.Template(src_path.read_text()).render(**context)
+            try:
+                rendered_content = jinja2.Template(src_path.read_text()).render(**context)
+            except jinja2.TemplateError as e:
+                raise RuntimeError(f"Template error in {src_path.name}: {e}") from e
             dest_path.write_text(rendered_content)
             written.append(dest_path)
 

@@ -2,7 +2,7 @@
 
 A CLI tool that scaffolds production-ready Python projects for Google Cloud Platform, using [uv](https://docs.astral.sh/uv/) for package management and [Cloud Native Buildpacks](https://buildpacks.io/) for containerization.
 
-## What You Get
+## Features
 
 Generated projects include:
 
@@ -10,7 +10,7 @@ Generated projects include:
   - Request/response validation with [Pydantic](https://docs.pydantic.dev/) across both interfaces
   - Auto-generated [OpenAPI](https://www.openapis.org/) spec and interactive docs via FastAPI
 - **Configurable deploy targets** — Cloud Run (service), Cloud Run Jobs, or both
-- **Per-environment config** — `local`, `dev`, `stage`, and `prod` for both app settings and deploy settings
+- **Per-environment config** — `local`, `stage`, and `prod` for both app settings and similar deploy settings (can add more if needed)
 - **Deployment scripts** — One-command deploys to Cloud Run and Cloud Run Jobs via `make`
 - **Structured logging** with [structlog](https://www.structlog.org/), compatible with GCP logging formats
 - **Linting and formatting** with [ruff](https://docs.astral.sh/ruff/)
@@ -25,14 +25,14 @@ Generated projects include:
 ## Install
 
 ```bash
-# Install globally (editable for development)
-uv tool install --editable /path/to/gcp-uv-pytemplate
-
-# Or run without installing
-uvx --from /path/to/gcp-uv-pytemplate gcp-uv-pytemplate new
+pip install pytemplate-uv
+# or
+uv pip install pytemplate-uv
 ```
 
 ## Usage
+
+Follow instructions below to generate a new project. Once completed, navigate into your newly created project directory and follow the instructions in the README.md to complete the setup of your project and make it your own!
 
 ### Interactive
 
@@ -86,9 +86,18 @@ deploy_targets: both
 
 ## Development
 
+### Setup
+
+1. Clone the repo
+2. Run:
 ```bash
+make help     # Show useful helper commands (lint, tetst, etc.)
 make setup    # install dependencies
 make lint     # lint and format
 make test     # run tests
 make version  # show current version
+
+# Install globally (editable for development)
+uv tool install --editable /path/to/gcp-uv-pytemplate
 ```
+### 

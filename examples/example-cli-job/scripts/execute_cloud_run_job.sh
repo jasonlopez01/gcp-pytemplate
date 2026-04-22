@@ -9,7 +9,7 @@
 #
 # Examples:
 #   ./scripts/execute_cloud_run_job.sh prod.deploy.env
-#   ./scripts/execute_cloud_run_job.sh dev.deploy.env items
+#   ./scripts/execute_cloud_run_job.sh stage.deploy.env items
 #
 # Requirements:
 #   - gcloud CLI installed and authenticated

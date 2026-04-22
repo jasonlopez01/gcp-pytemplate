@@ -70,8 +70,15 @@ def _gcloud_config(key: str) -> str | None:
 
 
 def _load_yaml(path: Path) -> dict:
-    with open(path) as f:
-        data = yaml.safe_load(f)
+    try:
+        with open(path) as f:
+            data = yaml.safe_load(f)
+    except FileNotFoundError:
+        raise typer.BadParameter(f"Config file not found: {path}")
+    except yaml.YAMLError as e:
+        raise typer.BadParameter(f"Invalid YAML in {path.name}: {e}")
+    if not isinstance(data, dict):
+        raise typer.BadParameter(f"{path.name} must contain a YAML mapping, got: {type(data).__name__}")
     required = {
         "project_name",
         "project_description",
@@ -88,8 +95,21 @@ def _load_yaml(path: Path) -> dict:
     return data
 
 
+_GCP_VALIDATIONS: list[tuple[str, str, str]] = [
+    ("gcp_project", r"^[a-z][a-z0-9\-]{4,28}[a-z0-9]$", "lowercase letters, digits, and hyphens (6-30 chars, must start with a letter)"),
+    ("gcp_region", r"^[a-z]+-[a-z]+[0-9]+$", "e.g. us-central1, europe-west4"),
+    ("gcp_service_account", r"^[a-z0-9\-]+@[a-z0-9\-]+\.iam\.gserviceaccount\.com$", "e.g. my-sa@my-project.iam.gserviceaccount.com"),
+    ("gcp_artifact_repo", r"^[a-z0-9][a-z0-9\-_\.]{0,61}[a-z0-9]$", "lowercase letters, digits, hyphens, underscores, and dots"),
+]
+
+
 def _build_context(data: dict) -> dict:
     """Build the full Jinja2 render context from a parsed YAML inputs dict."""
+    for field, pattern, hint in _GCP_VALIDATIONS:
+        value = data.get(field, "")
+        if not re.fullmatch(pattern, str(value)):
+            raise typer.BadParameter(f"Invalid {field} {value!r} — expected {hint}")
+
     project_name = data["project_name"]
     project_slug = slugify(project_name)
     project_module = project_slug.replace("-", "_")

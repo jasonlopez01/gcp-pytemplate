@@ -7,7 +7,7 @@ help: ## Show available commands
 
 # ── Init ──────────────────────────────────────────────────────────────────────
 
-init: ## Install dependencies
+setup: ## Install dependencies
 	uv sync --group dev
 
 # ── Lint ──────────────────────────────────────────────────────────────────────

@@ -15,7 +15,7 @@ setup: ## Install dependencies
 
 # Usage:
 #   make start-api                          # defaults to local.env
-#   make start-api APP_CONFIG=dev.env
+#   make start-api APP_CONFIG=stage.env
 
 APP_CONFIG ?= local.env
 
