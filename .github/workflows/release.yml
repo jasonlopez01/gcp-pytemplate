@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  workflow_run:
+    workflows: [Tests]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write  # PSR: push version commit + tag, create GitHub release
+  id-token: write  # PyPI: OIDC trusted publisher (no token needed)
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # PSR needs full git history to parse commits
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Semantic Release
+        id: release
+        uses: python-semantic-release/python-semantic-release@v9
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to PyPI
+        # Note: no credentials needed — OIDC trusted publisher handles auth
+        if: steps.release.outputs.released == 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1
