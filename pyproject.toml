@@ -1,7 +1,7 @@
 [project]
 name = "gcp-uv-pytemplate"
 version = "0.1.0"
-description = "Add your description here"
+description = "gcp-uv-pytemplate is a CLI tool that scaffolds production-ready Python projects for Google Cloud Platform, using [uv](https://docs.astral.sh/uv/) for package management and [Cloud Native Buildpacks](https://buildpacks.io/) for containerization. With built-in uv tooling, optional FastAPI/Typer entrypoints, GCP authentication utilities, and a CI/CD release pipeline out of the box."
 readme = "README.md"
 authors = [
     { name = "Jason Lopez", email = "jasonlopez01@gmail.com" }
@@ -30,7 +30,7 @@ dev = [
 gcp-uv-pytemplate = "gcp_uv_pytemplate:main"
 
 [build-system]
-requires = ["uv_build>=0.9.18,<0.10.0"]
+requires = ["uv_build>=0.9.18,<1.0.0"]
 build-backend = "uv_build"
 
 # Added -n (number of concurrent tests) and --dist=loadscope (load by class) for concurrency with pytest-xdist plugin
@@ -62,13 +62,7 @@ extend-exclude = [
 version_toml = ["pyproject.toml:project.version"]
 commit_parser = "conventional"
 tag_format = "v{version}"
-# pip install uv first — uv is not pre-installed in the PSR CI environment
-build_command = """
-    pip install uv
-    uv lock
-    git add uv.lock
-    uv build
-"""
+build_command = "uv build"
 
 [tool.semantic_release.commit_parser_options]
 minor_tags = ["feat"]

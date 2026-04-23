@@ -1,21 +1,20 @@
 # gcp-uv-pytemplate
 
-A CLI tool that scaffolds production-ready Python projects for Google Cloud Platform, using [uv](https://docs.astral.sh/uv/) for package management and [Cloud Native Buildpacks](https://buildpacks.io/) for containerization.
+## Overview
+gcp-uv-pytemplate is a CLI tool that scaffolds production-ready Python projects for Google Cloud Platform, using [uv](https://docs.astral.sh/uv/) for package management and [Cloud Native Buildpacks](https://buildpacks.io/) for containerization. With built-in uv tooling, optional FastAPI/Typer entrypoints, GCP authentication utilities, and a CI/CD release pipeline out of the box.
 
 ## Features
 
-Generated projects include:
-
-- **Configurable interfaces** — FastAPI (API), Typer (CLI), or both
+- 🔌 **Configurable interfaces** — FastAPI (API), Typer (CLI), or both
   - Request/response validation with [Pydantic](https://docs.pydantic.dev/) across both interfaces
   - Auto-generated [OpenAPI](https://www.openapis.org/) spec and interactive docs via FastAPI
-- **Configurable deploy targets** — Cloud Run (service), Cloud Run Jobs, or both
-- **Per-environment config** — `local`, `stage`, and `prod` for both app settings and similar deploy settings (can add more if needed)
-- **Deployment scripts** — One-command deploys to Cloud Run and Cloud Run Jobs via `make`
-- **Structured logging** with [structlog](https://www.structlog.org/), compatible with GCP logging formats
-- **Linting and formatting** with [ruff](https://docs.astral.sh/ruff/)
-- **Testing** with [pytest](https://docs.pytest.org/) (parallel execution via pytest-xdist)
-- **Procfile-based** process definitions for Cloud Native Buildpacks
+- ⚙️ **Per-environment config** — `local`, `stage`, and `prod` for both app settings and similar deploy settings (can add more if needed)
+- 🛠️ **Makefile with core commands** - One set of commands to test, lint, and deploy
+- 🚀 **Deployment scripts** — One-command deploys to configurable deploy targets including Cloud Run and Cloud Run Jobs
+- 📋 **Structured logging** with [structlog](https://www.structlog.org/), compatible with GCP logging formats
+- ✨ **Linting and formatting** with [ruff](https://docs.astral.sh/ruff/)
+- 🧪 **Testing** with [pytest](https://docs.pytest.org/) (parallel execution via pytest-xdist)
+- 📦 **Procfile-based** process definitions for Cloud Native Buildpacks
 
 ## Prerequisites
 

@@ -1,3 +1,18 @@
+# GCP service account credential helpers.
+#
+# Provides two public entry points:
+#   get_credentials(target_service_account, scopes)
+#       Returns impersonated SA credentials (or ADC credentials if the caller
+#       is already the target SA). Raises InvalidCredentialsOAuth2 if ADC are
+#       user OAuth2 credentials, which cannot be used as SA credentials.
+#
+#   get_identity_token(target_audience, target_service_account)
+#       Returns an OIDC ID token suitable for calling IAP-protected services.
+#       Impersonates target_service_account when provided; falls back to ADC.
+#
+# Prerequisites: the caller's ADC identity must have roles/iam.serviceAccountTokenCreator
+# on the target service account.
+
 import logging
 
 import google.auth
