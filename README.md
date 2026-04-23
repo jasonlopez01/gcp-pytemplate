@@ -25,9 +25,9 @@ Generated projects include:
 ## Install
 
 ```bash
-pip install pytemplate-uv
+pip install gcp-pytemplate-uv
 # or
-uv pip install pytemplate-uv
+uv pip install gcp-pytemplate-uv
 ```
 
 ## Usage
@@ -91,13 +91,42 @@ deploy_targets: both
 1. Clone the repo
 2. Run:
 ```bash
-make help     # Show useful helper commands (lint, tetst, etc.)
-make setup    # install dependencies
-make lint     # lint and format
-make test     # run tests
-make version  # show current version
+make help              # Show available commands
+make setup             # Install dependencies and git hooks (run once after cloning)
+make lint              # Lint and format with ruff
+make test              # Run tests
+make release-dry-run   # Preview next release without making changes
+make changelog         # Preview unreleased changelog entries
 
 # Install globally (editable for development)
 uv tool install --editable /path/to/gcp-uv-pytemplate
 ```
-### 
+
+## Contributing
+
+Commits on this repo follow the [Conventional Commits](https://www.conventionalcommits.org/) spec. The `make setup` command installs a git hook that validates your commit message format automatically.
+
+| Prefix | SemVer bump | Example |
+|--------|-------------|---------|
+| `fix:` | patch (0.1.0 → 0.1.1) | `fix: handle empty YAML config` |
+| `feat:` | minor (0.1.0 → 0.2.0) | `feat: add terraform target option` |
+| `feat!:` or `BREAKING CHANGE:` | major (0.1.0 → 1.0.0) | `feat!: rename CLI entry point` |
+| `chore:`, `ci:`, `docs:`, `test:`, `refactor:`, `style:` | none | `chore: update dependencies` |
+
+## Releasing
+
+Releases are fully automated. When commits are merged to `main`, [python-semantic-release](https://python-semantic-release.readthedocs.io/) inspects the commit history since the last tag and, if there are any `fix:` or `feat:` commits, it:
+
+1. Bumps the version in `pyproject.toml`
+2. Updates `CHANGELOG.md`
+3. Creates a git tag and GitHub Release
+4. Builds and publishes to PyPI via OIDC (no token required)
+
+If only non-releasable commits are present (`chore:`, `ci:`, etc.) no release is created.
+
+To preview what the next release would look like without making any changes:
+
+```bash
+make release-dry-run   # preview next version
+make changelog         # preview unreleased changelog entries
+``` 

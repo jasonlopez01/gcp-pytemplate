@@ -17,9 +17,12 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "commitizen>=4.1.0",
+    "pre-commit>=4.0.0",
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
     "pytest-xdist>=3.8.0",
+    "python-semantic-release>=9.0.0",
     "ruff>=0.11.0",
 ]
 
@@ -54,3 +57,38 @@ show_missing = true
 extend-exclude = [
     "src/gcp_uv_pytemplate/templates/**",
 ]
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+commit_parser = "conventional"
+tag_format = "v{version}"
+# pip install uv first — uv is not pre-installed in the PSR CI environment
+build_command = """
+    pip install uv
+    uv lock
+    git add uv.lock
+    uv build
+"""
+
+[tool.semantic_release.commit_parser_options]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf"]
+
+[tool.semantic_release.changelog]
+changelog_file = "CHANGELOG.md"
+exclude_commit_patterns = [
+    '''chore(?:\([^)]*?\))?: .+''',
+    '''ci(?:\([^)]*?\))?: .+''',
+    '''style(?:\([^)]*?\))?: .+''',
+    '''test(?:\([^)]*?\))?: .+''',
+    '''refactor(?:\([^)]*?\))?: .+''',
+]
+
+[tool.semantic_release.remote]
+type = "github"
+
+[tool.semantic_release.publish]
+upload_to_vcs_release = true
+
+[tool.commitizen]
+name = "cz_conventional_commits"

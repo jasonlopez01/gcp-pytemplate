@@ -1,4 +1,4 @@
-.PHONY: init lint test version generate-examples help
+.PHONY: init lint test version generate-examples release-dry-run changelog help
 
 # ── Help ──────────────────────────────────────────────────────────────────────
 
@@ -7,8 +7,9 @@ help: ## Show available commands
 
 # ── Init ──────────────────────────────────────────────────────────────────────
 
-setup: ## Install dependencies
+setup: ## Install dependencies and git hooks
 	uv sync --group dev
+	uv run pre-commit install --hook-type commit-msg
 
 # ── Lint ──────────────────────────────────────────────────────────────────────
 
@@ -21,20 +22,13 @@ lint: ## Lint and format with ruff
 test: ## Run tests
 	uv run pytest
 
-# ── Version ──────────────────────────────────────────────────────────────────
+# ── Release ───────────────────────────────────────────────────────────────────
 
-# Usage:
-#   make version                  # show current version
-#   make version BUMP=patch       # 0.1.0 → 0.1.1
-#   make version BUMP=minor       # 0.1.0 → 0.2.0
-#   make version BUMP=major       # 0.1.0 → 1.0.0
+release-dry-run: ## Preview what PSR would release (no changes made)
+	uv run semantic-release --noop version
 
-version: ## Show or bump version (BUMP=patch|minor|major)
-ifdef BUMP
-	uv version --bump $(BUMP)
-else
-	uv version
-endif
+changelog: ## Preview changelog entries since last tag
+	uv run semantic-release changelog --unreleased
 
 # ── Generate ─────────────────────────────────────────────────────────────────
 
