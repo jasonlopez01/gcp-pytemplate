@@ -116,10 +116,10 @@ Commits on this repo follow the [Conventional Commits](https://www.conventionalc
 
 Releases are fully automated. When commits are merged to `main`, [python-semantic-release](https://python-semantic-release.readthedocs.io/) inspects the commit history since the last tag and, if there are any `fix:` or `feat:` commits, it:
 
-1. Bumps the version in `pyproject.toml`
-2. Updates `CHANGELOG.md`
-3. Creates a git tag and GitHub Release
-4. Builds and publishes to PyPI via OIDC (no token required)
+1. Updates `CHANGELOG.md`
+2. Creates a git tag and GitHub Release
+3. Builds the package — version is derived from the git tag at build time via [hatch-vcs](https://github.com/ofek/hatch-vcs), so `pyproject.toml` carries no static version field
+4. Publishes to PyPI via OIDC (no token required)
 
 If only non-releasable commits are present (`chore:`, `ci:`, etc.) no release is created.
 
