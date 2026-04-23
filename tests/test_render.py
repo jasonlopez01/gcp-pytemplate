@@ -13,7 +13,6 @@ BASE_CONTEXT = {
     "gcp_project": "test-gcp-project",
     "gcp_region": "us-central1",
     "gcp_service_account": "sa@test-gcp-project.iam.gserviceaccount.com",
-    "gcp_artifact_repo": "my-repo",
     "author_name": "Test Author",
     "author_email": "test@example.com",
 }
@@ -227,7 +226,7 @@ class TestMakefileContent:
 
 
 class TestDeployConfigContent:
-    def _read_deploy_config(self, tmp_path, env="local", **overrides):
+    def _read_deploy_config(self, tmp_path, env="stage", **overrides):
         render_service(_context(**overrides), tmp_path)
         return (
             tmp_path / "my-test-app" / "deploy_configs" / f"{env}.deploy.env"
@@ -254,12 +253,11 @@ class TestDeployConfigContent:
         )
         assert "GCP_PROJECT" in content
         assert "GCP_REGION" in content
-        assert "GAR_REPO" in content
 
     def test_all_envs_rendered(self, tmp_path):
-        """All four deploy config environments should be rendered."""
+        """Both deploy config environments should be rendered."""
         render_service(_context(), tmp_path)
-        for env in ("local", "dev", "stage", "prod"):
+        for env in ("stage", "prod"):
             path = tmp_path / "my-test-app" / "deploy_configs" / f"{env}.deploy.env"
             assert path.exists(), f"{env}.deploy.env not rendered"
 
@@ -283,7 +281,7 @@ class TestVariableSubstitution:
     def test_gcp_values_in_deploy_config(self, tmp_path):
         render_service(_context(), tmp_path)
         content = (
-            tmp_path / "my-test-app" / "deploy_configs" / "local.deploy.env"
+            tmp_path / "my-test-app" / "deploy_configs" / "stage.deploy.env"
         ).read_text()
         assert "test-gcp-project" in content
         assert "us-central1" in content

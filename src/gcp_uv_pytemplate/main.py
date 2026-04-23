@@ -85,7 +85,6 @@ def _load_yaml(path: Path) -> dict:
         "gcp_project",
         "gcp_region",
         "gcp_service_account",
-        "gcp_artifact_repo",
     }
     missing = required - data.keys()
     if missing:
@@ -99,7 +98,6 @@ _GCP_VALIDATIONS: list[tuple[str, str, str]] = [
     ("gcp_project", r"^[a-z][a-z0-9\-]{4,28}[a-z0-9]$", "lowercase letters, digits, and hyphens (6-30 chars, must start with a letter)"),
     ("gcp_region", r"^[a-z]+-[a-z]+[0-9]+$", "e.g. us-central1, europe-west4"),
     ("gcp_service_account", r"^[a-z0-9\-]+@[a-z0-9\-]+\.iam\.gserviceaccount\.com$", "e.g. my-sa@my-project.iam.gserviceaccount.com"),
-    ("gcp_artifact_repo", r"^[a-z0-9][a-z0-9\-_\.]{0,61}[a-z0-9]$", "lowercase letters, digits, hyphens, underscores, and dots"),
 ]
 
 
@@ -130,7 +128,6 @@ def _build_context(data: dict) -> dict:
         "gcp_project": data["gcp_project"],
         "gcp_region": data["gcp_region"],
         "gcp_service_account": data["gcp_service_account"],
-        "gcp_artifact_repo": data["gcp_artifact_repo"],
         "author_name": data.get("author_name", ""),
         "author_email": data.get("author_email", ""),
         "include_api": include_api,
@@ -206,9 +203,6 @@ def new(
     gcp_service_account: str | None = typer.Option(
         None, help="GCP service account email"
     ),
-    gcp_artifact_repo: str | None = typer.Option(
-        None, help="Google Artifact Registry repository name"
-    ),
     author_name: str | None = typer.Option(
         None, help="Author full name (defaults to git config user.name)"
     ),
@@ -233,7 +227,6 @@ def new(
         gcp_project = gcp_project or data.get("gcp_project")
         gcp_region = gcp_region or data.get("gcp_region")
         gcp_service_account = gcp_service_account or data.get("gcp_service_account")
-        gcp_artifact_repo = gcp_artifact_repo or data.get("gcp_artifact_repo")
         author_name = author_name or data.get("author_name")
         author_email = author_email or data.get("author_email")
         interfaces = interfaces or data.get("interfaces")
@@ -257,9 +250,6 @@ def new(
     resolved_gcp_service_account = gcp_service_account or typer.prompt(
         "GCP service account email",
         default=f"placeholder@{resolved_gcp_project}.iam.gserviceaccount.com",
-    )
-    resolved_gcp_artifact_repo = gcp_artifact_repo or typer.prompt(
-        "Artifact Registry repository name"
     )
 
     if not interfaces:
@@ -293,7 +283,6 @@ def new(
         "gcp_project": resolved_gcp_project,
         "gcp_region": resolved_gcp_region,
         "gcp_service_account": resolved_gcp_service_account,
-        "gcp_artifact_repo": resolved_gcp_artifact_repo,
         "author_name": resolved_author_name,
         "author_email": resolved_author_email,
         "interfaces": interfaces,
@@ -323,7 +312,6 @@ def new(
         "gcp_project": resolved_gcp_project,
         "gcp_region": resolved_gcp_region,
         "gcp_service_account": resolved_gcp_service_account,
-        "gcp_artifact_repo": resolved_gcp_artifact_repo,
         "author_name": resolved_author_name,
         "author_email": resolved_author_email,
         "interfaces": interfaces,

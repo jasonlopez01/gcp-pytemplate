@@ -6,6 +6,5 @@ project_description: A FastAPI service deployed to Cloud Run
 gcp_project: my-gcp-project
 gcp_region: us-west2
 gcp_service_account: my-service-account@my-gcp-project.iam.gserviceaccount.com
-gcp_artifact_repo: demo-images
 interfaces: api
 deploy_targets: cloud-run

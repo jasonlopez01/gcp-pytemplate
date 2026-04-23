@@ -1,5 +1,10 @@
-from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+import time
+import uuid
+from collections.abc import Awaitable, Callable
+
+import structlog
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse, Response
 
 from example_api_service.api.router import router
 from example_api_service.config.app_config import APP_CONFIG
@@ -11,7 +16,30 @@ logger = get_logger(__name__)
 app = FastAPI(title="Example API Service", description="A FastAPI service deployed to Cloud Run")
 app.include_router(router)
 
-logger.info(f"starting; service={APP_CONFIG.APP_NAME}; env={APP_CONFIG.APP_ENV}; log_level={APP_CONFIG.LOG_LEVEL}")
+logger.info("starting", service=APP_CONFIG.APP_NAME, env=APP_CONFIG.APP_ENV, log_level=APP_CONFIG.LOG_LEVEL)
+
+
+@app.middleware("http")
+async def logging_middleware(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    structlog.contextvars.clear_contextvars()
+
+    request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
+    trace_header = request.headers.get("X-Cloud-Trace-Context", "")
+    trace_value = trace_header.split("/")[0] if trace_header else None
+
+    ctx: dict = dict(request_id=request_id, method=request.method, path=request.url.path)
+    if trace_value:
+        ctx["logging.googleapis.com/trace"] = trace_value
+    structlog.contextvars.bind_contextvars(**ctx)
+
+    start = time.perf_counter()
+    response: Response = await call_next(request)
+    duration_ms = round((time.perf_counter() - start) * 1000, 1)
+
+    logger.info("request", status_code=response.status_code, duration_ms=duration_ms)
+    return response
 
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)

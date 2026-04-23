@@ -3,7 +3,9 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from {{ project_module }}.app.models import ExampleModel, fetch_examples, fetch_example
+from {{ project_module }}.config.logging_config import get_logger
 
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/api", tags=["api", "examples"])
 
@@ -27,6 +29,9 @@ class ExampleResponse(BaseModel):
 
 @router.get("/list", response_model=list[ExampleResponse])
 def get_examples() -> list[ExampleResponse]:
+    logger.info("/list endpoint was hit")
+    logger.warning("test warning")
+    logger.error("test error!")
     return [ExampleResponse.from_example(i) for i in fetch_examples()]
 
 
