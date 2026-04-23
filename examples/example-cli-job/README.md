@@ -2,19 +2,19 @@
 
 A Typer CLI application deployed as a Cloud Run Job
 
-## Prerequisites
+## 📋 Prerequisites
 
 - [Python 3.13+](https://www.python.org/downloads/)
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
 - [Google Cloud SDK (gcloud)](https://cloud.google.com/sdk/docs/install)
 
-## Setup
+## 🚀 Setup
 
 ```bash
 make setup
 ```
 
-## Commands
+## 🛠️ Commands
 
 Run `make help` to see all available commands:
 
@@ -26,11 +26,11 @@ Run `make help` to see all available commands:
   deploy_gcrj     Deploy to Cloud Run Job (DEPLOY_CONFIG=<file>)
 ```
 
-## Interface
+## 🔌 Interface
 
-This project includes a **Typer** CLI application for Cloud Run Jobs (`src/example_cli_job/main_cli.py`).
+This project includes a **[Typer](https://typer.tiangolo.com)** CLI application for Cloud Run Jobs (`src/example_cli_job/main_cli.py`).
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 example-cli-job/
@@ -61,7 +61,7 @@ example-cli-job/
 └── pyproject.toml
 ```
 
-## Configuration
+## ⚙️ Configuration
 
 This project uses two layers of configuration files:
 
@@ -70,7 +70,7 @@ This project uses two layers of configuration files:
 
 Both have per-environment variants: `local`, `stage`, and `prod`.
 
-### .env Files and Secrets
+### 🔒 .env Files and Secrets
 **⚠️By default none of the .env files are gitignored and will be included in the git history, do not store senstive credentials there.**
 
 `.env` files are useful for specifying service and deployment configuration. Having a set of files make it easy to see and change values across environments - like certain constants, deployment settings, etc. Exactly the kinf of thing we want to be version-tracked and reviewable in PRs.

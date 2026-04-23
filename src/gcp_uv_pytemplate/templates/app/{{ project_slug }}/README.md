@@ -2,19 +2,19 @@
 
 {{ project_description }}
 
-## Prerequisites
+## 📋 Prerequisites
 
 - [Python 3.13+](https://www.python.org/downloads/)
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
 - [Google Cloud SDK (gcloud)](https://cloud.google.com/sdk/docs/install)
 
-## Setup
+## 🚀 Setup
 
 ```bash
 make setup
 ```
 
-## Commands
+## 🛠️ Commands
 
 Run `make help` to see all available commands:
 
@@ -37,22 +37,22 @@ Run `make help` to see all available commands:
 ```
 {% if include_api and include_cli %}
 
-## Interfaces
+## 🔌 Interfaces
 
 This project includes two interfaces:
 
-- **API** — FastAPI application served via Cloud Run (`src/{{ project_module }}/main_api.py`)
-- **CLI** — Typer command-line app for Cloud Run Jobs (`src/{{ project_module }}/main_cli.py`)
+- **API** — [FastAPI](https://fastapi.tiangolo.com) application served via Cloud Run (`src/{{ project_module }}/main_api.py`)
+- **CLI** — [Typer](https://typer.tiangolo.com) command-line app for Cloud Run Jobs (`src/{{ project_module }}/main_cli.py`)
 {% elif include_api %}
-## Interface
+## 🔌 Interface
 
-This project includes a **FastAPI** application served via Cloud Run (`src/{{ project_module }}/main_api.py`).
+This project includes a **[FastAPI](https://fastapi.tiangolo.com)** application served via Cloud Run (`src/{{ project_module }}/main_api.py`).
 {% elif include_cli %}
-## Interface
+## 🔌 Interface
 
-This project includes a **Typer** CLI application for Cloud Run Jobs (`src/{{ project_module }}/main_cli.py`).
+This project includes a **[Typer](https://typer.tiangolo.com)** CLI application for Cloud Run Jobs (`src/{{ project_module }}/main_cli.py`).
 {% endif %}
-## Project Structure
+## 📁 Project Structure
 
 ```
 {{ project_slug }}/
@@ -97,7 +97,7 @@ This project includes a **Typer** CLI application for Cloud Run Jobs (`src/{{ pr
 └── pyproject.toml
 ```
 
-## Configuration
+## ⚙️ Configuration
 
 This project uses two layers of configuration files:
 
@@ -106,7 +106,7 @@ This project uses two layers of configuration files:
 
 Both have per-environment variants: `local`, `stage`, and `prod`.
 
-### .env Files and Secrets
+### 🔒 .env Files and Secrets
 **⚠️By default none of the .env files are gitignored and will be included in the git history, do not store senstive credentials there.**
 
 `.env` files are useful for specifying service and deployment configuration. Having a set of files make it easy to see and change values across environments - like certain constants, deployment settings, etc. Exactly the kinf of thing we want to be version-tracked and reviewable in PRs.
