@@ -1,4 +1,6 @@
-.PHONY: init lint test version generate-examples release-dry-run changelog help
+.PHONY: init lint test test-all version generate-examples release-dry-run changelog help
+
+PYTHON_VERSIONS := 3.10 3.11 3.12 3.13 3.14
 
 # ── Help ──────────────────────────────────────────────────────────────────────
 
@@ -24,6 +26,12 @@ lint: ## Lint and format with ruff
 
 test: ## Run tests
 	uv run pytest
+
+test-all: ## Run tests against all supported Python versions
+	@for v in $(PYTHON_VERSIONS); do \
+		echo "=== Python $$v ==="; \
+		uv run --python $$v pytest || exit 1; \
+	done
 
 # ── Release ───────────────────────────────────────────────────────────────────
 

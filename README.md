@@ -1,5 +1,8 @@
 # gcp-uv-pytemplate
 
+[![Supported Python versions](https://img.shields.io/badge/python-3.10_%7C_3.11_%7C_3.12_%7C_3.13_%7C_3.14-blue?labelColor=grey&color=blue)](https://pypi.org/project/gcp-pytemplate-uv/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ## Overview
 gcp-uv-pytemplate is a CLI tool that scaffolds production-ready Python projects for Google Cloud Platform, using [uv](https://docs.astral.sh/uv/) for package management and [Cloud Native Buildpacks](https://buildpacks.io/) for containerization. With built-in uv tooling, optional FastAPI/Typer entrypoints, GCP authentication utilities, and a CI/CD release pipeline out of the box.
 
@@ -19,7 +22,7 @@ gcp-uv-pytemplate is a CLI tool that scaffolds production-ready Python projects 
 
 ## Prerequisites
 
-- [Python 3.13+](https://www.python.org/downloads/)
+- [Python 3.10+](https://www.python.org/downloads/)
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 ## Install
@@ -142,6 +145,7 @@ make setup             # Install dependencies and git hooks (run once after clon
 make install           # Install CLI and MCP server globally as editable (source changes apply immediately)
 make lint              # Lint and format with ruff
 make test              # Run tests
+make test-all          # Run tests against all supported Python versions (3.10–3.14)
 make release-dry-run   # Preview next release without making changes
 make changelog         # Preview unreleased changelog entries
 ```
