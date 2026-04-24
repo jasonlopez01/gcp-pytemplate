@@ -2,6 +2,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
 import questionary
@@ -13,6 +14,28 @@ from rich.tree import Tree
 from gcp_uv_pytemplate.render import render_service
 
 app = typer.Typer()
+
+
+def _get_version() -> str:
+    try:
+        return version("gcp-uv-pytemplate")
+    except PackageNotFoundError:
+        return "unknown"
+
+
+def _version_callback(value: bool) -> None:
+    if value:
+        typer.echo(f"gcp-uv-pytemplate {_get_version()}")
+        raise typer.Exit()
+
+
+@app.callback()
+def _main(
+    version: bool = typer.Option(  # noqa: ARG001
+        None, "--version", "-V", callback=_version_callback, is_eager=True, help="Show version and exit"
+    ),
+) -> None:
+    pass
 console = Console()
 
 UPDATABLE_COMPONENTS: dict[str, list[str]] = {

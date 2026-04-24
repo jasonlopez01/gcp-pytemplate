@@ -1,7 +1,6 @@
 """Tests for the update command and its helper functions."""
 
 import yaml
-import pytest
 from typer.testing import CliRunner
 
 from gcp_uv_pytemplate.main import (

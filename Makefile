@@ -11,6 +11,9 @@ setup: ## Install dependencies and git hooks
 	uv sync --group dev
 	uv run pre-commit install --hook-type commit-msg
 
+install: ## Install CLI and MCP server globally as editable (source changes apply immediately)
+	uv tool install --editable ".[mcp]"
+
 # ── Lint ──────────────────────────────────────────────────────────────────────
 
 lint: ## Lint and format with ruff

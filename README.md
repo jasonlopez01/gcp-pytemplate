@@ -15,6 +15,7 @@ gcp-uv-pytemplate is a CLI tool that scaffolds production-ready Python projects 
 - ✨ **Linting and formatting** with [ruff](https://docs.astral.sh/ruff/)
 - 🧪 **Testing** with [pytest](https://docs.pytest.org/) (parallel execution via pytest-xdist)
 - 📦 **Procfile-based** process definitions for Cloud Native Buildpacks
+- 🤖 **Agent-ready** — generated projects include an `AGENTS.md` with commands, config conventions, and project layout for AI coding assistants
 
 ## Prerequisites
 
@@ -48,7 +49,6 @@ You'll be prompted for:
 | GCP project | GCP project ID | `gcloud config` |
 | GCP region | Compute region | `gcloud config` |
 | GCP service account | Service account email | placeholder |
-| Artifact Registry repo | GAR repository name | — |
 | Interfaces | `api`, `cli`, or `both` | `both` |
 | Deploy targets | `cloud-run`, `cloud-run-jobs`, or `both` | `both` |
 
@@ -78,10 +78,57 @@ project_description: Does things
 gcp_project: my-gcp-project
 gcp_region: us-central1
 gcp_service_account: sa@my-gcp-project.iam.gserviceaccount.com
-gcp_artifact_repo: my-repo
 interfaces: both
 deploy_targets: both
 ```
+
+## MCP Server
+
+The MCP server lets you scaffold and update projects using an LLM and natural language — no flags or YAML files required. Just describe what you want.
+
+### Install
+
+```bash
+pip install gcp-uv-pytemplate[mcp]
+```
+
+### Configure
+
+**Claude Code** (`~/.claude/settings.json`):
+```json
+{
+  "mcpServers": {
+    "gcp-uv-pytemplate": {
+      "command": "gcp-uv-pytemplate-mcp"
+    }
+  }
+}
+```
+
+**Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+```json
+{
+  "mcpServers": {
+    "gcp-uv-pytemplate": {
+      "command": "gcp-uv-pytemplate-mcp"
+    }
+  }
+}
+```
+
+### Available tools
+
+| Tool | Description |
+|---|---|
+| `create_project` | Scaffold a new project — accepts name, description, GCP config, interfaces, deploy targets |
+| `update_project` | Update components of an existing project from the latest template |
+| `list_components` | List the components available to update |
+
+### Example prompts
+
+> *"Create a CLI-only project called data-pipeline in us-central1 on GCP project my-org-prod"*
+
+> *"Update the logging config in ~/Projects/my-service to the latest template"*
 
 ## Development
 
@@ -92,14 +139,14 @@ deploy_targets: both
 ```bash
 make help              # Show available commands
 make setup             # Install dependencies and git hooks (run once after cloning)
+make install           # Install CLI and MCP server globally as editable (source changes apply immediately)
 make lint              # Lint and format with ruff
 make test              # Run tests
 make release-dry-run   # Preview next release without making changes
 make changelog         # Preview unreleased changelog entries
-
-# Install globally (editable for development)
-uv tool install --editable /path/to/gcp-uv-pytemplate
 ```
+
+`make install` runs `uv tool install --editable ".[mcp]"`, wiring up both the `gcp-uv-pytemplate` and `gcp-uv-pytemplate-mcp` entry points globally. Because it's editable, any changes you make to the source are picked up immediately without reinstalling.
 
 ## Contributing
 

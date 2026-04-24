@@ -1,0 +1,7 @@
+{
+    "mcpServers": {
+        "gcp-uv-pytemplate": {
+            "command": "gcp-uv-pytemplate-mcp"
+        }
+    }
+}
