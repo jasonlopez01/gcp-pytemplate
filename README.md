@@ -8,7 +8,8 @@ gcp-pytemplate is a CLI tool that scaffolds production-ready Python projects for
 
 ## Features
 
-- 🔌 **Configurable interfaces** — FastAPI (API), Typer (CLI), or both
+- 🐍 **Python env management with [UV](https://docs.astral.sh/uv/)**
+- 🔌 **Configurable interfaces** — [FastAPI (API)](https://fastapi.tiangolo.com/), [Typer (CLI)](https://typer.tiangolo.com/), or both
   - Request/response validation with [Pydantic](https://docs.pydantic.dev/) across both interfaces
   - Auto-generated [OpenAPI](https://www.openapis.org/) spec and interactive docs via FastAPI
 - ⚙️ **Per-environment config** — `local`, `stage`, and `prod` for both app settings and similar deploy settings (can add more if needed)
