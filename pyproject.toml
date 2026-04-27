@@ -6,6 +6,16 @@ readme = "README.md"
 authors = [
     { name = "Jason Lopez", email = "jasonlopez01@gmail.com" }
 ]
+keywords = [
+    "python", 
+    "template", 
+    "project-generator", 
+    "uv", 
+    "fastapi", 
+    "typer",
+    "gcp", 
+    "cloud run", 
+]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
