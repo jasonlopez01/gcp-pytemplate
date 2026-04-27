@@ -1,5 +1,5 @@
 # Example: API-only project (FastAPI + Cloud Run)
-# Usage: gcp-uv-pytemplate new --from-file examples/api_project.yaml
+# Usage: gcp-pytemplate new --from-file examples/api_project.yaml
 
 project_name: Example API Service
 project_description: A FastAPI service deployed to Cloud Run

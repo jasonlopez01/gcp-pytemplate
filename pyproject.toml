@@ -1,7 +1,7 @@
 [project]
-name = "gcp-uv-pytemplate"
+name = "gcp-pytemplate"
 dynamic = ["version"]
-description = "gcp-uv-pytemplate is a CLI tool that scaffolds production-ready Python projects for Google Cloud Platform, using [uv](https://docs.astral.sh/uv/) for package management and [Cloud Native Buildpacks](https://buildpacks.io/) for containerization. With built-in uv tooling, optional FastAPI/Typer entrypoints, GCP authentication utilities, and a CI/CD release pipeline out of the box."
+description = "gcp-pytemplate is a CLI tool that scaffolds production-ready Python projects for Google Cloud Platform, using [uv](https://docs.astral.sh/uv/) for package management and [Cloud Native Buildpacks](https://buildpacks.io/) for containerization. With built-in uv tooling, optional FastAPI/Typer entrypoints, GCP authentication utilities, and a CI/CD release pipeline out of the box."
 readme = "README.md"
 authors = [
     { name = "Jason Lopez", email = "jasonlopez01@gmail.com" }
@@ -46,8 +46,8 @@ dev = [
 ]
 
 [project.scripts]
-gcp-uv-pytemplate     = "gcp_uv_pytemplate:main"
-gcp-uv-pytemplate-mcp = "gcp_uv_pytemplate.mcp_server:main"
+gcp-pytemplate     = "gcp_pytemplate:main"
+gcp-pytemplate-mcp = "gcp_pytemplate.mcp_server:main"
 
 [build-system]
 requires = ["hatchling", "hatch-vcs"]
@@ -78,7 +78,7 @@ show_missing = true
 [tool.ruff]
 # Exclude the templates because they aren't valid Python until rendered
 extend-exclude = [
-    "src/gcp_uv_pytemplate/templates/**",
+    "src/gcp_pytemplate/templates/**",
 ]
 
 [tool.semantic_release]

@@ -3,13 +3,13 @@
 import yaml
 from typer.testing import CliRunner
 
-from gcp_uv_pytemplate.main import (
+from gcp_pytemplate.main import (
     UPDATABLE_COMPONENTS,
     _build_context,
     _resolve_component_paths,
     app,
 )
-from gcp_uv_pytemplate.render import render_service
+from gcp_pytemplate.render import render_service
 
 
 runner = CliRunner()
@@ -33,7 +33,7 @@ def _make_project(tmp_path, **overrides) -> None:
     context = _build_context(data)
     render_service(context, tmp_path)
     project_root = tmp_path / context["project_slug"]
-    inputs_path = project_root / ".gcp-uv-pytemplate.yaml"
+    inputs_path = project_root / ".gcp-pytemplate.yaml"
     inputs_path.write_text(yaml.dump(data, default_flow_style=False, sort_keys=False))
 
 

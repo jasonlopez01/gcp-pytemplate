@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from mcp.server.fastmcp import Context, FastMCP
 
-from gcp_uv_pytemplate.main import (
+from gcp_pytemplate.main import (
     UPDATABLE_COMPONENTS,
     _build_context,
     _copy_from_temp,
@@ -17,9 +17,9 @@ from gcp_uv_pytemplate.main import (
     _resolve_component_paths,
     slugify,
 )
-from gcp_uv_pytemplate.render import render_service
+from gcp_pytemplate.render import render_service
 
-mcp = FastMCP("gcp-uv-pytemplate")
+mcp = FastMCP("gcp-pytemplate")
 
 
 class _Confirmation(BaseModel):
@@ -58,8 +58,8 @@ def _format_summary(
 
 @mcp.tool()
 def get_version() -> str:
-    """Return the installed version of gcp-uv-pytemplate."""
-    return f"gcp-uv-pytemplate {_get_version()}"
+    """Return the installed version of gcp-pytemplate."""
+    return f"gcp-pytemplate {_get_version()}"
 
 
 @mcp.tool()
@@ -76,7 +76,7 @@ async def create_project(
     author_email: str | None = None,
     ctx: Context | None = None,
 ) -> str:
-    """Scaffold a new GCP Python project from the gcp-uv-pytemplate template.
+    """Scaffold a new GCP Python project from the gcp-pytemplate template.
 
     interfaces: "api" (FastAPI), "cli" (Typer), or "both"
     deploy_targets: "cloud-run", "cloud-run-jobs", or "both"
@@ -136,7 +136,7 @@ async def create_project(
         "interfaces": interfaces,
         "deploy_targets": deploy_targets,
     }
-    inputs_path = project_root / ".gcp-uv-pytemplate.yaml"
+    inputs_path = project_root / ".gcp-pytemplate.yaml"
     inputs_path.write_text(yaml.dump(template_inputs, default_flow_style=False, sort_keys=False))
 
     author_display = f"{resolved_author_name} <{resolved_author_email}>" if resolved_author_name or resolved_author_email else "(none)"
@@ -158,7 +158,7 @@ def update_project(
     components: str | None = None,
     files: str | None = None,
 ) -> str:
-    """Update components of an existing gcp-uv-pytemplate project from the latest template.
+    """Update components of an existing gcp-pytemplate project from the latest template.
 
     project_path: path to an existing generated project directory
     components: comma-separated component names to update (e.g. "cache,logging_config")
@@ -167,12 +167,12 @@ def update_project(
            (alternative to components)
     """
     path = Path(project_path)
-    inputs_file = path / ".gcp-uv-pytemplate.yaml"
+    inputs_file = path / ".gcp-pytemplate.yaml"
 
     if not path.is_dir():
         return f"Error: '{project_path}' is not a directory."
     if not inputs_file.exists():
-        return f"Error: '{inputs_file}' not found. Is this a gcp-uv-pytemplate project?"
+        return f"Error: '{inputs_file}' not found. Is this a gcp-pytemplate project?"
 
     try:
         data = _load_yaml(inputs_file)

@@ -562,7 +562,7 @@ wheels = [
 ]
 
 [[package]]
-name = "gcp-uv-pytemplate"
+name = "gcp-pytemplate"
 source = { editable = "." }
 dependencies = [
     { name = "jinja2" },

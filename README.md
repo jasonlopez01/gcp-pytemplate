@@ -1,10 +1,10 @@
-# gcp-uv-pytemplate
+# gcp-pytemplate
 
-[![Supported Python versions](https://img.shields.io/badge/python-3.10_%7C_3.11_%7C_3.12_%7C_3.13_%7C_3.14-blue?labelColor=grey&color=blue)](https://pypi.org/project/gcp-pytemplate-uv/)
+[![Supported Python versions](https://img.shields.io/badge/python-3.10_%7C_3.11_%7C_3.12_%7C_3.13_%7C_3.14-blue?labelColor=grey&color=blue)](https://pypi.org/project/gcp-pytemplate/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
-gcp-uv-pytemplate is a CLI tool that scaffolds production-ready Python projects for Google Cloud Platform, using [uv](https://docs.astral.sh/uv/) for package management and [Cloud Native Buildpacks](https://buildpacks.io/) for containerization. With built-in uv tooling, optional FastAPI/Typer entrypoints, GCP authentication utilities, and a CI/CD release pipeline out of the box.
+gcp-pytemplate is a CLI tool that scaffolds production-ready Python projects for Google Cloud Platform, using [uv](https://docs.astral.sh/uv/) for package management and [Cloud Native Buildpacks](https://buildpacks.io/) for containerization. With built-in uv tooling, optional FastAPI/Typer entrypoints, GCP authentication utilities, and a CI/CD release pipeline out of the box.
 
 ## Features
 
@@ -28,9 +28,9 @@ gcp-uv-pytemplate is a CLI tool that scaffolds production-ready Python projects 
 ## Install
 
 ```bash
-pip install gcp-pytemplate-uv
+pip install gcp-pytemplate
 # or
-uv pip install gcp-pytemplate-uv
+uv pip install gcp-pytemplate
 ```
 
 ## Usage
@@ -40,7 +40,7 @@ Follow instructions below to generate a new project. Once completed, navigate in
 ### Interactive
 
 ```bash
-gcp-uv-pytemplate new
+gcp-pytemplate new
 ```
 
 You'll be prompted for:
@@ -58,7 +58,7 @@ You'll be prompted for:
 ### CLI flags
 
 ```bash
-gcp-uv-pytemplate new \
+gcp-pytemplate new \
   --project-name "My Service" \
   --project-description "Does things" \
   --gcp-project my-gcp-project \
@@ -71,7 +71,7 @@ gcp-uv-pytemplate new \
 ### From a YAML file
 
 ```bash
-gcp-uv-pytemplate new --from-file config.yaml
+gcp-pytemplate new --from-file config.yaml
 ```
 
 ```yaml
@@ -92,7 +92,7 @@ The MCP server lets you scaffold and update projects using an LLM and natural la
 ### Install
 
 ```bash
-pip install gcp-uv-pytemplate[mcp]
+pip install gcp-pytemplate[mcp]
 ```
 
 ### Configure
@@ -101,8 +101,8 @@ pip install gcp-uv-pytemplate[mcp]
 ```json
 {
   "mcpServers": {
-    "gcp-uv-pytemplate": {
-      "command": "gcp-uv-pytemplate-mcp"
+    "gcp-pytemplate": {
+      "command": "gcp-pytemplate-mcp"
     }
   }
 }
@@ -112,8 +112,8 @@ pip install gcp-uv-pytemplate[mcp]
 ```json
 {
   "mcpServers": {
-    "gcp-uv-pytemplate": {
-      "command": "gcp-uv-pytemplate-mcp"
+    "gcp-pytemplate": {
+      "command": "gcp-pytemplate-mcp"
     }
   }
 }
@@ -150,7 +150,7 @@ make release-dry-run   # Preview next release without making changes
 make changelog         # Preview unreleased changelog entries
 ```
 
-`make install` runs `uv tool install --editable ".[mcp]"`, wiring up both the `gcp-uv-pytemplate` and `gcp-uv-pytemplate-mcp` entry points globally. Because it's editable, any changes you make to the source are picked up immediately without reinstalling.
+`make install` runs `uv tool install --editable ".[mcp]"`, wiring up both the `gcp-pytemplate` and `gcp-pytemplate-mcp` entry points globally. Because it's editable, any changes you make to the source are picked up immediately without reinstalling.
 
 ## Contributing
 

@@ -7,7 +7,7 @@ import yaml
 
 pytest.importorskip("mcp")
 
-from gcp_uv_pytemplate.mcp_server import create_project, get_version, list_components, update_project  # noqa: E402
+from gcp_pytemplate.mcp_server import create_project, get_version, list_components, update_project  # noqa: E402
 
 
 _VALID_INPUTS = dict(
@@ -46,7 +46,7 @@ class TestCreateProject:
 
     def test_writes_inputs_yaml(self, tmp_path):
         _create(tmp_path)
-        inputs_file = tmp_path / "my-service" / ".gcp-uv-pytemplate.yaml"
+        inputs_file = tmp_path / "my-service" / ".gcp-pytemplate.yaml"
         assert inputs_file.exists()
         data = yaml.safe_load(inputs_file.read_text())
         assert data["project_name"] == "My Service"
@@ -79,11 +79,11 @@ class TestCreateProject:
 
     def test_resolves_author_defaults_from_git_config(self, tmp_path, monkeypatch):
         monkeypatch.setattr(
-            "gcp_uv_pytemplate.mcp_server._git_config",
+            "gcp_pytemplate.mcp_server._git_config",
             lambda key: "Test Author" if key == "user.name" else "test@example.com",
         )
         _create(tmp_path)
-        data = yaml.safe_load((tmp_path / "my-service" / ".gcp-uv-pytemplate.yaml").read_text())
+        data = yaml.safe_load((tmp_path / "my-service" / ".gcp-pytemplate.yaml").read_text())
         assert data["author_name"] == "Test Author"
         assert data["author_email"] == "test@example.com"
 
@@ -158,7 +158,7 @@ class TestUpdateProject:
 class TestGetVersion:
     def test_returns_package_name_and_version(self):
         result = get_version()
-        assert result.startswith("gcp-uv-pytemplate ")
+        assert result.startswith("gcp-pytemplate ")
 
     def test_version_is_not_unknown(self):
         result = get_version()

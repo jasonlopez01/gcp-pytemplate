@@ -2,7 +2,7 @@
 
 import pytest
 
-from gcp_uv_pytemplate.render import render_service
+from gcp_pytemplate.render import render_service
 
 
 BASE_CONTEXT = {

@@ -11,21 +11,21 @@ import yaml
 from rich.console import Console
 from rich.tree import Tree
 
-from gcp_uv_pytemplate.render import render_service
+from gcp_pytemplate.render import render_service
 
 app = typer.Typer()
 
 
 def _get_version() -> str:
     try:
-        return version("gcp-uv-pytemplate")
+        return version("gcp-pytemplate")
     except PackageNotFoundError:
         return "unknown"
 
 
 def _version_callback(value: bool) -> None:
     if value:
-        typer.echo(f"gcp-uv-pytemplate {_get_version()}")
+        typer.echo(f"gcp-pytemplate {_get_version()}")
         raise typer.Exit()
 
 
@@ -340,7 +340,7 @@ def new(
         "interfaces": interfaces,
         "deploy_targets": deploy_targets,
     }
-    inputs_path = project_root / ".gcp-uv-pytemplate.yaml"
+    inputs_path = project_root / ".gcp-pytemplate.yaml"
     inputs_path.write_text(
         yaml.dump(template_inputs, default_flow_style=False, sort_keys=False)
     )
@@ -370,13 +370,13 @@ def update(
     ),
 ) -> None:
     """Update components of an existing project from the latest template."""
-    inputs_file = project_path / ".gcp-uv-pytemplate.yaml"
+    inputs_file = project_path / ".gcp-pytemplate.yaml"
     if not project_path.is_dir():
         console.print(f"[red]Error: '{project_path}' is not a directory.[/red]")
         raise typer.Exit(1)
     if not inputs_file.exists():
         console.print(
-            f"[red]Error: '{inputs_file}' not found. Is this a gcp-uv-pytemplate project?[/red]"
+            f"[red]Error: '{inputs_file}' not found. Is this a gcp-pytemplate project?[/red]"
         )
         raise typer.Exit(1)
 

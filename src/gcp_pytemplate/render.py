@@ -35,7 +35,7 @@ def render_service(context: dict, output_dir: Path) -> list[Path]:
 
     Returns a list of files written.
     """
-    ref = pkg_resources.files("gcp_uv_pytemplate").joinpath(
+    ref = pkg_resources.files("gcp_pytemplate").joinpath(
         "templates/app/{{ project_slug }}"
     )
 
