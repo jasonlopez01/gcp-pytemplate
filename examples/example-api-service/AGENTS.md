@@ -32,6 +32,11 @@ APP_CONFIG_FILE=stage.env make start-api
 - `deploy_configs/` — per-environment deploy settings (`stage`, `prod`)
 - `scripts/` — deployment shell scripts (invoked via make)
 
+## Key Rules
+
+**Keep documentation in sync.** When making changes that affect functionality or interfaces (API request/responses, CLI flags, MCP tools, Python version support, make targets, project layout), update `README.md` and `AGENTS.md` to match. The Prerequisites, Usage, and Development sections of `README.md` and the Commands table in `AGENTS.md` are the primary places to check.
+
+
 ## Coding Standards
 
 **Use Pydantic for data modeling.** Prefer `pydantic.BaseModel` over native `@dataclass` for any structured data (config objects, request/response shapes, context models). Use `model_validator` and `field_validator` for validation logic rather than `__post_init__`. Pydantic models are the single source of truth for schema, validation, and serialization.
