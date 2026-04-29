@@ -43,3 +43,30 @@ APP_CONFIG_FILE=stage.env make start-api
 - Annotate all function signatures (parameters and return types); omit only where the type is genuinely unknowable
 
 **Write pytest-style tests.** Use plain functions (`def test_*`) and `assert` statements — no `unittest.TestCase`. Fixtures go in `conftest.py`. Parametrize with `@pytest.mark.parametrize` rather than looping inside a test. Use `tmp_path` for filesystem fixtures. Avoid mocking internals; test at the public API surface.
+
+## SQL Conventions
+
+**Use fully qualified resource paths.** Always reference tables with their full path — no bare table names:
+- BigQuery: `project.dataset.table`
+- Other databases: `database.schema.table`
+
+**Use lowercase keywords.** Write all SQL keywords in lowercase: `select`, `from`, `where`, `join`, `group by`, `order by`, etc.
+
+**Use single spaces around aliases.** No alignment padding — exactly one space on each side of `as`:
+```sql
+-- correct
+select
+    order_id as id,
+    customer_name as name
+from project.dataset.orders
+
+-- wrong
+select
+    order_id     as id,
+    customer_name as name
+from project.dataset.orders
+```
+
+**Use trailing commas.** Place commas at the end of each item in a select list, not the beginning.
+
+**Indent with 4 spaces.** Indent column lists and `on` clauses 4 spaces relative to their clause keyword.
