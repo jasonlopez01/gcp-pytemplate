@@ -42,6 +42,18 @@ uv run gcp-pytemplate update <project-path> --components logging_config
 - `src/gcp_pytemplate/mcp_server.py` — MCP server (`create_project`, `update_project`, `list_components` tools)
 - `tests/` — `test_render.py` (template output), `test_update.py` (update command), `test_mcp_server.py` (MCP tools)
 
+## Coding Standards
+
+**Use Pydantic for data modeling.** Prefer `pydantic.BaseModel` over native `@dataclass` for any structured data (config objects, request/response shapes, context models). Use `model_validator` and `field_validator` for validation logic rather than `__post_init__`. Pydantic models are the single source of truth for schema, validation, and serialization.
+
+**Use modern Python type hints.** Target Python 3.10+ syntax throughout:
+- Built-in generics: `list[str]`, `dict[str, int]`, `tuple[str, ...]` — not `List`, `Dict`, `Tuple` from `typing`
+- Union shorthand: `str | None` — not `Optional[str]` or `Union[str, None]`
+- `typing.Any`, `typing.Literal`, `typing.TypeVar`, `typing.Protocol` are still fine where needed
+- Annotate all function signatures (parameters and return types); omit only where the type is genuinely unknowable
+
+**Write pytest-style tests.** Use plain functions (`def test_*`) and `assert` statements — no `unittest.TestCase`. Fixtures go in `conftest.py`. Parametrize with `@pytest.mark.parametrize` rather than looping inside a test. Use `tmp_path` for filesystem fixtures. Avoid mocking internals; test at the public API surface.
+
 ## Key Rules
 
 **CLI and MCP server must stay in sync.** When adding or changing inputs to the `new` command in `main.py` (parameters, defaults, validation, resolution logic), apply the equivalent change to `create_project` in `mcp_server.py`. Both share `_build_context()` for validation, but default resolution (e.g. git/gcloud config lookups) and the elicitation summary in `_format_summary` must be updated manually to match.
