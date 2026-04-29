@@ -6,6 +6,7 @@ import yaml
 from pydantic import BaseModel
 
 from mcp.server.fastmcp import Context, FastMCP
+from mcp.shared.exceptions import McpError
 
 from gcp_pytemplate.main import (
     UPDATABLE_COMPONENTS,
@@ -102,9 +103,9 @@ async def create_project(
         )
         try:
             result = await ctx.elicit(summary, _Confirmation)
-            if result.action != "accept":
+            if result.action != "accept" or not result.data.confirmed:
                 return "Project creation cancelled."
-        except Exception:
+        except McpError:
             pass  # client doesn't support elicitation — proceed silently
 
     try:
@@ -185,6 +186,9 @@ def update_project(
 
     if files:
         rel_paths = [f.strip() for f in files.split(",") if f.strip()]
+        for p in rel_paths:
+            if Path(p).is_absolute() or ".." in Path(p).parts:
+                return f"Error: invalid path '{p}' — must be a relative path within the project"
     elif components:
         component_names = [c.strip() for c in components.split(",") if c.strip()]
         invalid = [c for c in component_names if c not in UPDATABLE_COMPONENTS]
