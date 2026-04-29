@@ -1,4 +1,4 @@
-.PHONY: setup lint test{% if include_api %} start-api{% endif %}{% if include_cloud_run_jobs %} execute-job{% endif %}{% if include_cloud_run %} deploy_gcr{% endif %}{% if include_cloud_run_jobs %} deploy_gcrj{% endif %} help
+.PHONY: setup{% if include_cli %} install{% endif %} lint test{% if include_api %} start-api{% endif %}{% if include_cloud_run_jobs %} execute-job{% endif %}{% if include_cloud_run %} deploy_gcr{% endif %}{% if include_cloud_run_jobs %} deploy_gcrj{% endif %} help
 
 # ── Help ──────────────────────────────────────────────────────────────────────
 
@@ -10,6 +10,11 @@ help: ## Show available commands
 setup: ## Install dependencies
 	uv sync --group dev
 
+{% if include_cli %}
+install: ## Install CLI globally as editable (source changes apply immediately)
+	uv tool install --editable .
+
+{% endif %}
 {% if include_api %}
 # ── Serve ─────────────────────────────────────────────────────────────────────
 

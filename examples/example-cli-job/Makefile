@@ -1,4 +1,4 @@
-.PHONY: setup lint test execute-job deploy_gcrj help
+.PHONY: setup install lint test execute-job deploy_gcrj help
 
 # ── Help ──────────────────────────────────────────────────────────────────────
 
@@ -9,6 +9,11 @@ help: ## Show available commands
 
 setup: ## Install dependencies
 	uv sync --group dev
+
+
+install: ## Install CLI globally as editable (source changes apply immediately)
+	uv tool install --editable .
+
 
 
 # ── Lint ──────────────────────────────────────────────────────────────────────

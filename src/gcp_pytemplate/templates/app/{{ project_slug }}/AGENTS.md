@@ -7,6 +7,9 @@ Use `make` for all core operations. Run `make help` to list everything available
 | Command | Description |
 |---|---|
 | `make setup` | Install dependencies |
+{%- if include_cli %}
+| `make install` | Install CLI globally as editable (source changes apply immediately) |
+{%- endif %}
 | `make lint` | Lint and autoformat (ruff) |
 | `make test` | Run tests |
 {%- if include_api %}

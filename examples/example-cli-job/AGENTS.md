@@ -7,6 +7,7 @@ Use `make` for all core operations. Run `make help` to list everything available
 | Command | Description |
 |---|---|
 | `make setup` | Install dependencies |
+| `make install` | Install CLI globally as editable (source changes apply immediately) |
 | `make lint` | Lint and autoformat (ruff) |
 | `make test` | Run tests |
 | `make deploy_gcrj DEPLOY_CONFIG=<file>` | Deploy as Cloud Run Job |
