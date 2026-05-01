@@ -72,3 +72,42 @@ uv run gcp-pytemplate update <project-path> --components logging_config
 | `fix:`, `perf:` | patch | yes |
 | `docs:` | none | yes |
 | `chore:`, `ci:`, `style:`, `test:`, `refactor:` | none | no |
+
+## SQL Conventions
+
+**Use fully qualified resource paths.** Always reference tables with their full path — no bare table names:
+- BigQuery: `project.dataset.table`
+- Other databases: `database.schema.table`
+
+**Use lowercase keywords.** Write all SQL keywords in lowercase: `select`, `from`, `where`, `join`, `group by`, `order by`, etc.
+
+**Use single spaces around aliases.** No alignment padding — exactly one space on each side of `as`:
+```sql
+-- correct
+select
+    order_id as id,
+    customer_name as name
+from project.dataset.orders
+
+-- wrong
+select
+    order_id     as id,
+    customer_name as name
+from project.dataset.orders
+```
+
+**Use trailing commas.** Place commas at the end of each item in a select list, not the beginning.
+
+**Indent with 4 spaces.** Indent column lists and `on` clauses 4 spaces relative to their clause keyword.
+
+
+## Writing Style
+
+**Avoid AI tells.** Comments, docs, commit messages, and PR descriptions should read like they were written by a developer, not generated. Specific patterns to avoid:
+
+- No em-dashes (`—`). Use a comma, semicolon, colon, or rewrite the sentence.
+- No filler openers: "Certainly", "Sure", "Of course", "Absolutely", "Great", "Happy to help".
+- No over-explanation of obvious things. If the code is clear, don't restate it in a comment.
+- No "This commit..." or "This PR..." prefix in commit/PR titles. Start with the verb: "Add", "Fix", "Remove", "Update".
+- No closing affirmations: "Let me know if you have questions", "Hope this helps", "Feel free to reach out".
+- Prefer plain words over formal ones: "use" not "utilize", "show" not "demonstrate", "check" not "verify" when the meaning is the same.
