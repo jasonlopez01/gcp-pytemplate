@@ -83,5 +83,3 @@ dmypy.json
 # Secrets
 secrets/
 
-# UV
-uv.lock
