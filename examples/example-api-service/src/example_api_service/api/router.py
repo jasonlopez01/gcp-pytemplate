@@ -1,8 +1,9 @@
 from datetime import datetime
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from example_api_service.app.models import ExampleModel, fetch_examples, fetch_example
+from example_api_service.app.models import ExampleModel, fetch_example, fetch_examples
 from example_api_service.config.logging_config import get_logger
 
 logger = get_logger(__name__)

@@ -9,7 +9,6 @@ pytest.importorskip("mcp")
 
 from gcp_pytemplate.mcp_server import create_project, get_version, list_components, update_project  # noqa: E402
 
-
 _VALID_INPUTS = dict(
     project_name="My Service",
     project_description="A test service",

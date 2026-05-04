@@ -4,7 +4,6 @@ import pytest
 
 from gcp_pytemplate.render import render_service
 
-
 BASE_CONTEXT = {
     "project_name": "My Test App",
     "project_slug": "my-test-app",

@@ -3,10 +3,9 @@ from pathlib import Path
 
 import typer
 import yaml
-from pydantic import BaseModel
-
 from mcp.server.fastmcp import Context, FastMCP
 from mcp.shared.exceptions import McpError
+from pydantic import BaseModel
 
 from gcp_pytemplate.main import (
     UPDATABLE_COMPONENTS,

@@ -3,7 +3,6 @@ from pathlib import Path
 
 import jinja2
 
-
 # Files/directories to exclude based on context flags.
 # Each rule is (path_fragment, required_flag).
 _EXCLUSION_RULES = [

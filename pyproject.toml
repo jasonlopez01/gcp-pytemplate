@@ -86,10 +86,20 @@ omit = [
 show_missing = true
 
 [tool.ruff]
+line-length = 120
+target-version = "py313"
 # Exclude the templates because they aren't valid Python until rendered
 extend-exclude = [
     "src/gcp_pytemplate/templates/**",
 ]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
 
 [tool.semantic_release]
 commit_parser = "conventional"

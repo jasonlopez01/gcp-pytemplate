@@ -11,7 +11,6 @@ from gcp_pytemplate.main import (
 )
 from gcp_pytemplate.render import render_service
 
-
 runner = CliRunner()
 
 _YAML_INPUTS = {

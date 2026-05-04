@@ -33,7 +33,7 @@ class DeployedEnvData(BaseModel):
     SERVICE_ACCOUNT_EMAIL: str = Field(description="Serivce Accountfrom env", default=DEAULT_STR_VALUE)
 
 
-@lru_cache()
+@lru_cache
 def load_deployed_env_data() -> DeployedEnvData:
     """Load deployed GCP envrionment data, from env vars and fetched from metadata server."""
 
