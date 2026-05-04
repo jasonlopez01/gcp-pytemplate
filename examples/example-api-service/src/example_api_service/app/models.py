@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 class ExampleModel(BaseModel):
     """Example pydantic Model"""
-    
+
     model_config = ConfigDict(str_strip_whitespace=True)
 
     id: UUID = Field(default_factory=uuid4, description="Auto-generated unique UUID4 id.")
@@ -22,6 +22,7 @@ _examples: list[ExampleModel] = [
     ExampleModel(id="46914fde-89c3-4054-8e97-7c131adfff3f", name="Jason", email="jason@fake.com", ex_bool=False),
     ExampleModel(id="e3c40fef-ac0f-4748-ad13-4df3017c3c2c", name="Maya", email="maya@fake.com"),
 ]
+
 
 def fetch_examples() -> list[ExampleModel]:
     return _examples

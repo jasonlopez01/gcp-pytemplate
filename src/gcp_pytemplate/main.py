@@ -36,6 +36,8 @@ def _main(
     ),
 ) -> None:
     pass
+
+
 console = Console()
 
 UPDATABLE_COMPONENTS: dict[str, list[str]] = {
@@ -111,16 +113,22 @@ def _load_yaml(path: Path) -> dict:
     }
     missing = required - data.keys()
     if missing:
-        raise typer.BadParameter(
-            f"Missing required fields in {path.name}: {', '.join(sorted(missing))}"
-        )
+        raise typer.BadParameter(f"Missing required fields in {path.name}: {', '.join(sorted(missing))}")
     return data
 
 
 _GCP_VALIDATIONS: list[tuple[str, str, str]] = [
-    ("gcp_project", r"^[a-z][a-z0-9\-]{4,28}[a-z0-9]$", "lowercase letters, digits, and hyphens (6-30 chars, must start with a letter)"),
+    (
+        "gcp_project",
+        r"^[a-z][a-z0-9\-]{4,28}[a-z0-9]$",
+        "lowercase letters, digits, and hyphens (6-30 chars, must start with a letter)",
+    ),
     ("gcp_region", r"^[a-z]+-[a-z]+[0-9]+$", "e.g. us-central1, europe-west4"),
-    ("gcp_service_account", r"^[a-z0-9\-]+@[a-z0-9\-]+\.iam\.gserviceaccount\.com$", "e.g. my-sa@my-project.iam.gserviceaccount.com"),
+    (
+        "gcp_service_account",
+        r"^[a-z0-9\-]+@[a-z0-9\-]+\.iam\.gserviceaccount\.com$",
+        "e.g. my-sa@my-project.iam.gserviceaccount.com",
+    ),
 ]
 
 
@@ -210,37 +218,17 @@ def _copy_from_temp(
 
 @app.command()
 def new(
-    from_file: Path | None = typer.Option(
-        None, "--from-file", "-f", help="Path to a YAML file with template inputs"
-    ),
+    from_file: Path | None = typer.Option(None, "--from-file", "-f", help="Path to a YAML file with template inputs"),
     project_name: str | None = typer.Option(None, help="Human-readable project name"),
-    project_description: str | None = typer.Option(
-        None, help="Short project description"
-    ),
-    gcp_project: str | None = typer.Option(
-        None, help="GCP project ID (defaults to gcloud config)"
-    ),
-    gcp_region: str | None = typer.Option(
-        None, help="GCP region (defaults to gcloud config compute/region)"
-    ),
-    gcp_service_account: str | None = typer.Option(
-        None, help="GCP service account email"
-    ),
-    author_name: str | None = typer.Option(
-        None, help="Author full name (defaults to git config user.name)"
-    ),
-    author_email: str | None = typer.Option(
-        None, help="Author email (defaults to git config user.email)"
-    ),
-    interfaces: str | None = typer.Option(
-        None, help="Interfaces to include: api, cli, or both"
-    ),
-    deploy_targets: str | None = typer.Option(
-        None, help="Deploy targets: cloud-run, cloud-run-jobs, or both"
-    ),
-    output_dir: Path = typer.Option(
-        Path.cwd(), help="Directory to create the project in"
-    ),
+    project_description: str | None = typer.Option(None, help="Short project description"),
+    gcp_project: str | None = typer.Option(None, help="GCP project ID (defaults to gcloud config)"),
+    gcp_region: str | None = typer.Option(None, help="GCP region (defaults to gcloud config compute/region)"),
+    gcp_service_account: str | None = typer.Option(None, help="GCP service account email"),
+    author_name: str | None = typer.Option(None, help="Author full name (defaults to git config user.name)"),
+    author_email: str | None = typer.Option(None, help="Author email (defaults to git config user.email)"),
+    interfaces: str | None = typer.Option(None, help="Interfaces to include: api, cli, or both"),
+    deploy_targets: str | None = typer.Option(None, help="Deploy targets: cloud-run, cloud-run-jobs, or both"),
+    output_dir: Path = typer.Option(Path.cwd(), help="Directory to create the project in"),
 ) -> None:
     """Create a new GCP app project from the template."""
     if from_file:
@@ -260,16 +248,10 @@ def new(
     project_slug = slugify(project_name)
 
     resolved_author_name = author_name or _git_config("user.name") or "Your Name"
-    resolved_author_email = (
-        author_email or _git_config("user.email") or "you@example.com"
-    )
+    resolved_author_email = author_email or _git_config("user.email") or "you@example.com"
 
-    resolved_gcp_project = gcp_project or typer.prompt(
-        "GCP project", default=_gcloud_config("project") or ""
-    )
-    resolved_gcp_region = gcp_region or typer.prompt(
-        "GCP region", default=_gcloud_config("compute/region") or ""
-    )
+    resolved_gcp_project = gcp_project or typer.prompt("GCP project", default=_gcloud_config("project") or "")
+    resolved_gcp_region = gcp_region or typer.prompt("GCP region", default=_gcloud_config("compute/region") or "")
     resolved_gcp_service_account = gcp_service_account or typer.prompt(
         "GCP service account email",
         default=f"placeholder@{resolved_gcp_project}.iam.gserviceaccount.com",
@@ -290,27 +272,25 @@ def new(
         ).ask()
 
     if deploy_targets == "cloud-run" and interfaces == "cli":
-        console.print(
-            "[yellow]Cloud Run requires the API interface — adding it.[/yellow]"
-        )
+        console.print("[yellow]Cloud Run requires the API interface — adding it.[/yellow]")
         interfaces = "both"
     if deploy_targets == "cloud-run-jobs" and interfaces == "api":
-        console.print(
-            "[yellow]Cloud Run Jobs requires the CLI interface — adding it.[/yellow]"
-        )
+        console.print("[yellow]Cloud Run Jobs requires the CLI interface — adding it.[/yellow]")
         interfaces = "both"
 
-    context = _build_context({
-        "project_name": project_name,
-        "project_description": project_description,
-        "gcp_project": resolved_gcp_project,
-        "gcp_region": resolved_gcp_region,
-        "gcp_service_account": resolved_gcp_service_account,
-        "author_name": resolved_author_name,
-        "author_email": resolved_author_email,
-        "interfaces": interfaces,
-        "deploy_targets": deploy_targets,
-    })
+    context = _build_context(
+        {
+            "project_name": project_name,
+            "project_description": project_description,
+            "gcp_project": resolved_gcp_project,
+            "gcp_region": resolved_gcp_region,
+            "gcp_service_account": resolved_gcp_service_account,
+            "author_name": resolved_author_name,
+            "author_email": resolved_author_email,
+            "interfaces": interfaces,
+            "deploy_targets": deploy_targets,
+        }
+    )
 
     project_root = output_dir / project_slug
     if project_root.exists():
@@ -323,9 +303,7 @@ def new(
             raise typer.Exit()
         shutil.rmtree(project_root)
 
-    console.print(
-        f"\n[bold]Creating[/bold] [cyan]{project_name}[/cyan] → [green]{project_slug}[/green]"
-    )
+    console.print(f"\n[bold]Creating[/bold] [cyan]{project_name}[/cyan] → [green]{project_slug}[/green]")
 
     written = render_service(context, output_dir)
 
@@ -341,25 +319,19 @@ def new(
         "deploy_targets": deploy_targets,
     }
     inputs_path = project_root / ".gcp-pytemplate.yaml"
-    inputs_path.write_text(
-        yaml.dump(template_inputs, default_flow_style=False, sort_keys=False)
-    )
+    inputs_path.write_text(yaml.dump(template_inputs, default_flow_style=False, sort_keys=False))
     written.append(inputs_path)
 
     tree = Tree(f"[green]{project_slug}/[/green]")
     _build_tree(tree, project_root, written)
     console.print(tree)
 
-    console.print(
-        f"\n[bold green]Done![/bold green] Project created at [cyan]{project_root}[/cyan]"
-    )
+    console.print(f"\n[bold green]Done![/bold green] Project created at [cyan]{project_root}[/cyan]")
 
 
 @app.command()
 def update(
-    project_path: Path = typer.Argument(
-        ..., help="Path to an existing generated project"
-    ),
+    project_path: Path = typer.Argument(..., help="Path to an existing generated project"),
     components: str | None = typer.Option(
         None,
         help=f"Comma-separated components to update: {', '.join(UPDATABLE_COMPONENTS)}",
@@ -375,9 +347,7 @@ def update(
         console.print(f"[red]Error: '{project_path}' is not a directory.[/red]")
         raise typer.Exit(1)
     if not inputs_file.exists():
-        console.print(
-            f"[red]Error: '{inputs_file}' not found. Is this a gcp-pytemplate project?[/red]"
-        )
+        console.print(f"[red]Error: '{inputs_file}' not found. Is this a gcp-pytemplate project?[/red]")
         raise typer.Exit(1)
 
     data = _load_yaml(inputs_file)
@@ -395,8 +365,7 @@ def update(
         invalid = [c for c in component_names if c not in UPDATABLE_COMPONENTS]
         if invalid:
             console.print(
-                f"[red]Unknown components: {', '.join(invalid)}. "
-                f"Available: {', '.join(UPDATABLE_COMPONENTS)}[/red]"
+                f"[red]Unknown components: {', '.join(invalid)}. Available: {', '.join(UPDATABLE_COMPONENTS)}[/red]"
             )
             raise typer.Exit(1)
         rel_paths = _resolve_component_paths(component_names, project_module)

@@ -247,9 +247,7 @@ def test_deploy_config_cloud_run_jobs_only(tmp_path):
 
 
 def test_deploy_config_shared_config_always_present(tmp_path):
-    content = _read_deploy_config(
-        tmp_path, include_cloud_run=False, include_cloud_run_jobs=False
-    )
+    content = _read_deploy_config(tmp_path, include_cloud_run=False, include_cloud_run_jobs=False)
     assert "GCP_PROJECT" in content
     assert "GCP_REGION" in content
 
@@ -281,9 +279,7 @@ def test_project_module_in_paths(tmp_path):
 
 def test_gcp_values_in_deploy_config(tmp_path):
     render_service(_context(), tmp_path)
-    content = (
-        tmp_path / "my-test-app" / "deploy_configs" / "stage.deploy.env"
-    ).read_text()
+    content = (tmp_path / "my-test-app" / "deploy_configs" / "stage.deploy.env").read_text()
     assert "test-gcp-project" in content
     assert "us-central1" in content
     assert "{{ gcp_project }}" not in content
@@ -296,6 +292,4 @@ def test_no_unrendered_jinja_variables(tmp_path):
         content = path.read_text()
         # Allow ${...} (shell variables) but flag {{ ... }} (Jinja leftovers)
         if "{{" in content and "}}" in content:
-            pytest.fail(
-                f"Unrendered Jinja variable in {path.name}:\n{content[:200]}"
-            )
+            pytest.fail(f"Unrendered Jinja variable in {path.name}:\n{content[:200]}")

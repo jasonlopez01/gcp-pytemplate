@@ -24,7 +24,7 @@ class ExampleResponse(BaseModel):
         raw_values = example.model_dump()
         raw_values["email"] = "******"
         raw_values["id"] = str(raw_values["id"])
-        resp_values = {k:v for k,v in raw_values.items() if k not in exclude_keys}
+        resp_values = {k: v for k, v in raw_values.items() if k not in exclude_keys}
         return cls(**resp_values)
 
 

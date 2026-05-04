@@ -100,9 +100,7 @@ def test_resolves_author_defaults_from_git_config(tmp_path, monkeypatch):
 
 def test_updates_logging_config(tmp_path):
     _create(tmp_path)
-    logging_file = (
-        tmp_path / "my-service" / "src" / "my_service" / "config" / "logging_config.py"
-    )
+    logging_file = tmp_path / "my-service" / "src" / "my_service" / "config" / "logging_config.py"
     original = logging_file.read_text()
     logging_file.write_text("# overwritten\n")
 

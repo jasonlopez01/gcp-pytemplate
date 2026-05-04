@@ -29,13 +29,13 @@ class LogLevel(StrEnum):
 class AppConfigModel(BaseSettings):
     """Runtime app configuration — values loaded from a .env file at startup."""
 
-    model_config = SettingsConfigDict(
-        str_strip_whitespace=True, extra="ignore", env_file_encoding="utf-8"
-    )
+    model_config = SettingsConfigDict(str_strip_whitespace=True, extra="ignore", env_file_encoding="utf-8")
 
     # App
     APP_NAME: str = Field(description="Application name.")
-    APP_ENV: Annotated[str, StringConstraints(to_lower=True)] = Field(description="Application environment (ex. `prod`, `dev`, `local`, etc.).")
+    APP_ENV: Annotated[str, StringConstraints(to_lower=True)] = Field(
+        description="Application environment (ex. `prod`, `dev`, `local`, etc.)."
+    )
     HEALTH_CHECK_ROUTE: str = Field(description="API route to use as health check.", default="/healthcheck")
     LOG_LEVEL: LogLevel = Field(default=LogLevel.INFO)
 

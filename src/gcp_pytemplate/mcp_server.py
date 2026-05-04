@@ -108,17 +108,19 @@ async def create_project(
             pass  # client doesn't support elicitation — proceed silently
 
     try:
-        context = _build_context({
-            "project_name": project_name,
-            "project_description": project_description,
-            "gcp_project": gcp_project,
-            "gcp_region": gcp_region,
-            "gcp_service_account": gcp_service_account,
-            "interfaces": interfaces,
-            "deploy_targets": deploy_targets,
-            "author_name": resolved_author_name,
-            "author_email": resolved_author_email,
-        })
+        context = _build_context(
+            {
+                "project_name": project_name,
+                "project_description": project_description,
+                "gcp_project": gcp_project,
+                "gcp_region": gcp_region,
+                "gcp_service_account": gcp_service_account,
+                "interfaces": interfaces,
+                "deploy_targets": deploy_targets,
+                "author_name": resolved_author_name,
+                "author_email": resolved_author_email,
+            }
+        )
     except typer.BadParameter as e:
         return f"Error: {e}"
 
@@ -139,7 +141,11 @@ async def create_project(
     inputs_path = project_root / ".gcp-pytemplate.yaml"
     inputs_path.write_text(yaml.dump(template_inputs, default_flow_style=False, sort_keys=False))
 
-    author_display = f"{resolved_author_name} <{resolved_author_email}>" if resolved_author_name or resolved_author_email else "(none)"
+    author_display = (
+        f"{resolved_author_name} <{resolved_author_email}>"
+        if resolved_author_name or resolved_author_email
+        else "(none)"
+    )
     return (
         f"Created '{context['project_slug']}' with {len(written)} files at {project_root}\n\n"
         f"Settings used:\n"
