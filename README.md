@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
-gcp-pytemplate is a CLI tool that scaffolds production-ready Python projects for Google Cloud Platform, using [uv](https://docs.astral.sh/uv/) for package management and [Cloud Native Buildpacks](https://buildpacks.io/) for containerization. With built-in uv tooling, optional FastAPI/Typer entrypoints, GCP authentication utilities, and a CI/CD release pipeline out of the box.
+gcp-pytemplate is a CLI tool that scaffolds production-ready Python projects for Google Cloud Platform, using [uv](https://docs.astral.sh/uv/) for package management and [Cloud Native Buildpacks](https://buildpacks.io/) for containerization. With built-in uv tooling, optional FastAPI/Typer entrypoints, GCP authentication utilities.
 
 ## Features
 
