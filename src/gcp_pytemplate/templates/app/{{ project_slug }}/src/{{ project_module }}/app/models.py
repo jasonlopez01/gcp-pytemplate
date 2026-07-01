@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID, uuid4
 from pydantic import BaseModel, ConfigDict, Field, EmailStr
 
@@ -12,7 +12,7 @@ class ExampleModel(BaseModel):
     name: str = Field(min_length=1, max_length=200, description="Name, non-empty string with min/max validation.")
     email: EmailStr
     ex_bool: bool = Field(default=True, description="Example bool")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime | None = Field(default=None)
 
 
