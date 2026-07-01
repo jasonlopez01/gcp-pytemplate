@@ -8,15 +8,16 @@ from fastapi.responses import HTMLResponse, Response
 
 from example_api_service.api.router import router
 from example_api_service.config.app_config import APP_CONFIG
+from example_api_service.config.gcp_env import GCP_ENV_DATA
 from example_api_service.config.logging_config import configure_logging, get_logger
 
-configure_logging(APP_CONFIG.LOG_LEVEL, APP_CONFIG.APP_ENV)
+configure_logging(APP_CONFIG.LOG_LEVEL, APP_CONFIG.APP_ENV, service=APP_CONFIG.APP_NAME)
 logger = get_logger(__name__)
 
 app = FastAPI(title="Example API Service", description="A FastAPI service deployed to Cloud Run")
 app.include_router(router)
 
-logger.info("starting", service=APP_CONFIG.APP_NAME, env=APP_CONFIG.APP_ENV, log_level=APP_CONFIG.LOG_LEVEL)
+logger.info("starting", log_level=APP_CONFIG.LOG_LEVEL)
 
 
 @app.middleware("http")
@@ -28,8 +29,9 @@ async def logging_middleware(request: Request, call_next: Callable[[Request], Aw
     trace_value = trace_header.split("/")[0] if trace_header else None
 
     ctx: dict = dict(request_id=request_id, method=request.method, path=request.url.path)
-    if trace_value:
-        ctx["logging.googleapis.com/trace"] = trace_value
+    if trace_value and GCP_ENV_DATA.IS_DEPLOYED:
+        # Cloud Logging only links logs to a trace when the value is the full resource path.
+        ctx["logging.googleapis.com/trace"] = f"projects/{GCP_ENV_DATA.GCP_PROJECT}/traces/{trace_value}"
     structlog.contextvars.bind_contextvars(**ctx)
 
     start = time.perf_counter()
