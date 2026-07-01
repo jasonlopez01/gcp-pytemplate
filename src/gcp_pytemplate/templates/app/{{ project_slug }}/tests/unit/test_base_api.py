@@ -1,19 +1,8 @@
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from {{ project_module }}.api.router import router
+from {{ project_module }}.main_api import app
 
-# Build a minimal app from the router to avoid config dependencies in tests.
-_app = FastAPI()
-_app.include_router(router)
-
-
-@_app.get("/healthcheck")
-def _healthcheck() -> dict:
-    return {"status": "ok"}
-
-
-client = TestClient(_app)
+client = TestClient(app)
 
 
 def test_healthcheck_returns_ok():
