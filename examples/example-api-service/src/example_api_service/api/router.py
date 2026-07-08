@@ -1,9 +1,8 @@
 from datetime import datetime
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from example_api_service.app.models import ExampleModel, fetch_example, fetch_examples
+from example_api_service.app.models import ExampleModel, fetch_examples, fetch_example
 from example_api_service.config.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -24,7 +23,7 @@ class ExampleResponse(BaseModel):
         raw_values = example.model_dump()
         raw_values["email"] = "******"
         raw_values["id"] = str(raw_values["id"])
-        resp_values = {k: v for k, v in raw_values.items() if k not in exclude_keys}
+        resp_values = {k:v for k,v in raw_values.items() if k not in exclude_keys}
         return cls(**resp_values)
 
 

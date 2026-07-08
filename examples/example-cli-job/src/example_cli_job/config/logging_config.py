@@ -83,8 +83,14 @@ def _add_service_context(service: str, env: str) -> Processor:
 
 
 def _rename_for_gcp(logger: object, method: str, event_dict: EventDict) -> EventDict:
-    """Map structlog fields to the keys Cloud Logging reads: 'severity' and 'time'."""
+    """Map structlog fields to the keys Cloud Logging reads: 'severity', 'time' and 'message'.
+
+    Cloud Logging promotes 'severity' to the entry level, 'time' to the entry timestamp, and shows
+    'message' as the Logs Explorer summary line (otherwise it renders the whole JSON payload).
+    """
     event_dict["severity"] = event_dict.pop("level", method).upper()
     if "timestamp" in event_dict:
         event_dict["time"] = event_dict.pop("timestamp")
+    if "event" in event_dict:
+        event_dict["message"] = event_dict.pop("event")
     return event_dict
