@@ -1,4 +1,4 @@
-.PHONY: setup{% if include_cli %} install{% endif %} lint test{% if include_api %} start-api{% endif %}{% if include_cloud_run_jobs %} execute-job{% endif %}{% if include_cloud_run %} deploy_gcr{% endif %}{% if include_cloud_run_jobs %} deploy_gcrj{% endif %} help
+.PHONY: setup{% if include_cli %} install{% endif %} lint test{% if include_api %} start-api{% endif %}{% if include_cloud_run_jobs %} execute-job{% endif %}{% if include_cloud_run %} invoke-api deploy_gcr{% endif %}{% if include_cloud_run_jobs %} deploy_gcrj{% endif %} help
 
 # ── Help ──────────────────────────────────────────────────────────────────────
 
@@ -61,6 +61,15 @@ ifndef DEPLOY_CONFIG
 	$(error DEPLOY_CONFIG is required. Usage: make deploy_gcr DEPLOY_CONFIG=prod.deploy.env)
 endif
 	bash ./scripts/deploy_cloud_run.sh $(DEPLOY_CONFIG)
+
+# Usage:
+#   make invoke-api DEPLOY_CONFIG=stage.deploy.env ARGS="--health"
+#   make invoke-api DEPLOY_CONFIG=stage.deploy.env ARGS="GET /api/list"
+invoke-api: ## Call the deployed Cloud Run API behind IAM (DEPLOY_CONFIG=<file> ARGS="--health | <METHOD> <PATH>")
+ifndef DEPLOY_CONFIG
+	$(error DEPLOY_CONFIG is required. Usage: make invoke-api DEPLOY_CONFIG=stage.deploy.env ARGS="GET /api/list")
+endif
+	bash ./scripts/invoke_cloud_run.sh $(DEPLOY_CONFIG) $(ARGS)
 {% endif %}
 {% if include_cloud_run_jobs %}
 

@@ -13,6 +13,7 @@ _EXCLUSION_RULES = [
     ("src/{{ project_module }}/main_cli.py", "include_cli"),
     ("tests/unit/test_base_cli.py", "include_cli"),
     ("scripts/deploy_cloud_run.sh", "include_cloud_run"),
+    ("scripts/invoke_cloud_run.sh", "include_cloud_run"),
     ("scripts/deploy_cloud_run_job.sh", "include_cloud_run_jobs"),
     ("scripts/execute_cloud_run_job.sh", "include_cloud_run_jobs"),
 ]
