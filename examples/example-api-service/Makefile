@@ -56,6 +56,3 @@ ifndef DEPLOY_CONFIG
 	$(error DEPLOY_CONFIG is required. Usage: make invoke-api DEPLOY_CONFIG=stage.deploy.env ARGS="GET /api/list")
 endif
 	bash ./scripts/invoke_cloud_run.sh $(DEPLOY_CONFIG) $(ARGS)
-
-
-

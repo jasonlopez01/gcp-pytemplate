@@ -70,8 +70,8 @@ ifndef DEPLOY_CONFIG
 	$(error DEPLOY_CONFIG is required. Usage: make invoke-api DEPLOY_CONFIG=stage.deploy.env ARGS="GET /api/list")
 endif
 	bash ./scripts/invoke_cloud_run.sh $(DEPLOY_CONFIG) $(ARGS)
-{% endif %}
-{% if include_cloud_run_jobs %}
+{%- endif %}
+{%- if include_cloud_run_jobs %}
 
 # Usage:
 #   make deploy_gcrj DEPLOY_CONFIG=prod.deploy.env
@@ -80,6 +80,5 @@ ifndef DEPLOY_CONFIG
 	$(error DEPLOY_CONFIG is required. Usage: make deploy_gcrj DEPLOY_CONFIG=prod.deploy.env)
 endif
 	bash ./scripts/deploy_cloud_run_job.sh $(DEPLOY_CONFIG)
-{% endif %}
-{% endif %}
-
+{%- endif %}
+{%- endif %}

@@ -1,6 +1,7 @@
-from datetime import datetime, timedelta, timezone
+from collections.abc import Callable
+from datetime import UTC, datetime, timedelta
 from functools import lru_cache, wraps
-from typing import Any, Callable
+from typing import Any
 
 """
 Based on below
@@ -20,14 +21,14 @@ def timed_lru_cache(seconds: int = 300, maxsize: int = 50):
         # Wrap the function with standard lru_cache
         cached_func = lru_cache(maxsize=maxsize)(func)
         lifetime = timedelta(seconds=seconds)
-        expiration = datetime.now(timezone.utc) + lifetime
+        expiration = datetime.now(UTC) + lifetime
 
         @wraps(func)
         def wrapped_func(*args, **kwargs):
             nonlocal expiration
-            if datetime.now(timezone.utc) >= expiration:
+            if datetime.now(UTC) >= expiration:
                 cached_func.cache_clear()
-                expiration = datetime.now(timezone.utc) + lifetime
+                expiration = datetime.now(UTC) + lifetime
 
             return cached_func(*args, **kwargs)
 

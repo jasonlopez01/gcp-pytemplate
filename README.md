@@ -23,8 +23,10 @@ gcp-pytemplate is a CLI tool that scaffolds production-ready Python projects for
 
 ## Prerequisites
 
-- [Python 3.10+](https://www.python.org/downloads/)
+- [Python 3.10+](https://www.python.org/downloads/) to run `gcp-pytemplate` itself
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
+
+Generated projects target **Python 3.13+** — they pin `requires-python = ">=3.13"` and a matching `.python-version`.
 
 ## Install
 
@@ -68,6 +70,8 @@ gcp-pytemplate new \
   --deploy-targets cloud-run \
   --output-dir ~/Projects
 ```
+
+Add `--overwrite` to replace an existing project directory without the interactive prompt.
 
 ### From a YAML file
 
@@ -124,7 +128,7 @@ pip install gcp-pytemplate[mcp]
 
 | Tool | Description |
 |---|---|
-| `create_project` | Scaffold a new project — accepts name, description, GCP config, interfaces, deploy targets |
+| `create_project` | Scaffold a new project — accepts name, description, GCP config, interfaces, deploy targets. Refuses to write into an existing non-empty directory unless `overwrite=true` |
 | `update_project` | Update components of an existing project from the latest template |
 | `list_components` | List the components available to update |
 
@@ -180,4 +184,4 @@ To preview what the next release would look like without making any changes:
 ```bash
 make release-dry-run   # preview next version
 make changelog         # preview unreleased changelog entries
-``` 
+```

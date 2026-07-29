@@ -1,3 +1,4 @@
+import shutil
 import tempfile
 from pathlib import Path
 
@@ -37,10 +38,15 @@ def _format_summary(
     interfaces: str,
     deploy_targets: str,
     project_root: Path,
+    replacing_existing: bool = False,
 ) -> str:
     slug = slugify(project_name)
+    warning = (
+        f"\n  WARNING: {project_root} already exists and will be DELETED and replaced.\n" if replacing_existing else ""
+    )
     return (
-        f"Please confirm the following project settings before creation:\n\n"
+        f"Please confirm the following project settings before creation:\n"
+        f"{warning}\n"
         f"  project_name:        {project_name}\n"
         f"  project_slug:        {slug}\n"
         f"  project_description: {project_description}\n"
@@ -74,6 +80,7 @@ async def create_project(
     output_dir: str | None = None,
     author_name: str | None = None,
     author_email: str | None = None,
+    overwrite: bool = False,
     ctx: Context | None = None,
 ) -> str:
     """Scaffold a new GCP Python project from the gcp-pytemplate template.
@@ -81,32 +88,13 @@ async def create_project(
     interfaces: "api" (FastAPI), "cli" (Typer), or "both"
     deploy_targets: "cloud-run", "cloud-run-jobs", or "both"
     output_dir: directory to create the project in (defaults to current directory)
+    overwrite: delete and replace the project directory if it already exists (destructive)
     """
     resolved_author_name = author_name or _git_config("user.name") or ""
     resolved_author_email = author_email or _git_config("user.email") or ""
     out = Path(output_dir) if output_dir else Path.cwd()
-    project_root = out / slugify(project_name)
 
-    if ctx is not None:
-        summary = _format_summary(
-            project_name=project_name,
-            project_description=project_description,
-            author_name=resolved_author_name,
-            author_email=resolved_author_email,
-            gcp_project=gcp_project,
-            gcp_region=gcp_region,
-            gcp_service_account=gcp_service_account,
-            interfaces=interfaces,
-            deploy_targets=deploy_targets,
-            project_root=project_root,
-        )
-        try:
-            result = await ctx.elicit(summary, _Confirmation)
-            if result.action != "accept" or not result.data.confirmed:
-                return "Project creation cancelled."
-        except McpError:
-            pass  # client doesn't support elicitation — proceed silently
-
+    # Validate before prompting so bad input fails fast instead of after a confirmation round-trip.
     try:
         context = _build_context(
             {
@@ -124,8 +112,41 @@ async def create_project(
     except typer.BadParameter as e:
         return f"Error: {e}"
 
-    written = render_service(context, out)
     project_root = out / context["project_slug"]
+
+    # render_service writes files in place, so without this an existing project is silently clobbered.
+    replacing_existing = project_root.exists() and any(project_root.iterdir())
+    if replacing_existing and not overwrite:
+        return (
+            f"Error: '{project_root}' already exists and is not empty. Pick a different project_name "
+            f"or output_dir, or call again with overwrite=true to delete and replace it."
+        )
+
+    if ctx is not None:
+        summary = _format_summary(
+            project_name=project_name,
+            project_description=project_description,
+            author_name=resolved_author_name,
+            author_email=resolved_author_email,
+            gcp_project=gcp_project,
+            gcp_region=gcp_region,
+            gcp_service_account=gcp_service_account,
+            interfaces=interfaces,
+            deploy_targets=deploy_targets,
+            project_root=project_root,
+            replacing_existing=replacing_existing,
+        )
+        try:
+            result = await ctx.elicit(summary, _Confirmation)
+            if result.action != "accept" or not result.data.confirmed:
+                return "Project creation cancelled."
+        except McpError:
+            pass  # client doesn't support elicitation — proceed silently
+
+    if replacing_existing:
+        shutil.rmtree(project_root)
+
+    written = render_service(context, out)
 
     template_inputs = {
         "project_name": project_name,

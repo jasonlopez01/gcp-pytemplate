@@ -21,9 +21,7 @@ logger.info("starting", log_level=APP_CONFIG.LOG_LEVEL)
 
 
 @app.middleware("http")
-async def logging_middleware(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
+async def logging_middleware(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
     structlog.contextvars.clear_contextvars()
 
     request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())

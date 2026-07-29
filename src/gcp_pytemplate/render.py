@@ -55,7 +55,9 @@ def render_service(context: dict, output_dir: Path) -> list[Path]:
             dest_path.parent.mkdir(parents=True, exist_ok=True)
 
             try:
-                rendered_content = jinja2.Template(src_path.read_text()).render(**context)
+                # keep_trailing_newline: Jinja drops the final newline by default, which leaves
+                # every rendered file without one and fails the generated project's own formatter.
+                rendered_content = jinja2.Template(src_path.read_text(), keep_trailing_newline=True).render(**context)
             except jinja2.TemplateError as e:
                 raise RuntimeError(f"Template error in {src_path.name}: {e}") from e
             dest_path.write_text(rendered_content)

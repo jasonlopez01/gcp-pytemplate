@@ -1,3 +1,4 @@
+import keyword
 import re
 import shutil
 import subprocess
@@ -143,6 +144,14 @@ def _build_context(data: dict) -> dict:
     project_slug = slugify(project_name)
     project_module = project_slug.replace("-", "_")
 
+    # A name made only of punctuation slugifies to "", which would resolve the project root back to
+    # the output directory itself. A leading digit produces an unimportable module name.
+    if not project_module.isidentifier() or keyword.iskeyword(project_module):
+        raise typer.BadParameter(
+            f"Invalid project_name {project_name!r} — must start with a letter and contain at least "
+            "one letter, digit, space, hyphen, or underscore"
+        )
+
     interfaces = data.get("interfaces", "both").strip().lower()
     deploy_targets = data.get("deploy_targets", "both").strip().lower()
 
@@ -229,6 +238,9 @@ def new(
     interfaces: str | None = typer.Option(None, help="Interfaces to include: api, cli, or both"),
     deploy_targets: str | None = typer.Option(None, help="Deploy targets: cloud-run, cloud-run-jobs, or both"),
     output_dir: Path = typer.Option(Path.cwd(), help="Directory to create the project in"),
+    overwrite: bool = typer.Option(
+        False, "--overwrite", help="Replace an existing project directory without prompting"
+    ),
 ) -> None:
     """Create a new GCP app project from the template."""
     if from_file:
@@ -245,7 +257,6 @@ def new(
 
     project_name = project_name or typer.prompt("Project name")
     project_description = project_description or typer.prompt("Project description")
-    project_slug = slugify(project_name)
 
     resolved_author_name = author_name or _git_config("user.name") or "Your Name"
     resolved_author_email = author_email or _git_config("user.email") or "you@example.com"
@@ -292,13 +303,17 @@ def new(
         }
     )
 
+    project_slug = context["project_slug"]
     project_root = output_dir / project_slug
-    if project_root.exists():
-        overwrite = questionary.confirm(
-            f"Directory '{project_slug}' already exists. Overwrite?",
-            default=False,
-        ).ask()
-        if not overwrite:
+    if project_root.exists() and any(project_root.iterdir()):
+        confirmed = (
+            overwrite
+            or questionary.confirm(
+                f"Directory '{project_slug}' already exists. Overwrite?",
+                default=False,
+            ).ask()
+        )
+        if not confirmed:
             console.print("[yellow]Aborted.[/yellow]")
             raise typer.Exit()
         shutil.rmtree(project_root)

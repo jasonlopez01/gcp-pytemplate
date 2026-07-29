@@ -4,7 +4,7 @@ A FastAPI service deployed to Cloud Run
 
 ## 📋 Prerequisites
 
-- [Python 3.10+](https://www.python.org/downloads/)
+- [Python 3.13+](https://www.python.org/downloads/)
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
 - [Google Cloud SDK (gcloud)](https://cloud.google.com/sdk/docs/install)
 

@@ -42,7 +42,6 @@ endif
 
 
 
-
 # Usage:
 #   make deploy_gcrj DEPLOY_CONFIG=prod.deploy.env
 deploy_gcrj: ## Deploy to Cloud Run Job (DEPLOY_CONFIG=<file>)
@@ -50,5 +49,3 @@ ifndef DEPLOY_CONFIG
 	$(error DEPLOY_CONFIG is required. Usage: make deploy_gcrj DEPLOY_CONFIG=prod.deploy.env)
 endif
 	bash ./scripts/deploy_cloud_run_job.sh $(DEPLOY_CONFIG)
-
-

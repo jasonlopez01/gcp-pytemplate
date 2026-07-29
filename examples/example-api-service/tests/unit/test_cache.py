@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from unittest.mock import patch
 
 from example_api_service.utils.cache import make_hashable, timed_lru_cache
@@ -41,7 +41,7 @@ def test_cache_expires_after_lifetime():
         call_count += 1
         return x * 2
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     with patch("example_api_service.utils.cache.datetime") as mock_dt:
         mock_dt.now.return_value = now

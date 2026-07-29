@@ -2,7 +2,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from {{ project_module }}.app.models import ExampleModel, fetch_examples, fetch_example
+from {{ project_module }}.app.models import ExampleModel, fetch_example, fetch_examples
 from {{ project_module }}.config.logging_config import get_logger
 
 app = typer.Typer(no_args_is_help=True)
