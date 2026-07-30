@@ -39,7 +39,8 @@ shift
 case "${1:-}" in
     --health)
         METHOD="GET"
-        REQUEST_PATH="/healthcheck"
+        # Resolved from the app config after the deploy config is loaded, since the route is configurable.
+        REQUEST_PATH=""
         ;;
     "" | -*)
         echo "Error: expected --health or '<METHOD> <PATH>', got '${1:-}'."
@@ -68,6 +69,18 @@ fi
 
 echo "Loading deploy config: ${DEPLOY_CONFIG_FILE}"
 source "${DEPLOY_CONFIG_FILE}"
+
+# ── Resolve the health check route ────────────────────────────────────────────
+
+# The API serves its health check at HEALTH_CHECK_ROUTE, so read it from the same app config the
+# deployment uses rather than assuming the default. App configs are plain KEY="value" lines.
+if [[ -z "${REQUEST_PATH}" ]]; then
+    APP_CONFIG_PATH="${PROJECT_ROOT}/src/{{ project_module }}/config/app_configs/${APP_CONFIG:-}"
+    if [[ -f "${APP_CONFIG_PATH}" ]]; then
+        source "${APP_CONFIG_PATH}"
+    fi
+    REQUEST_PATH="${HEALTH_CHECK_ROUTE:-/healthcheck}"
+fi
 
 # ── Resolve service URL + identity token ──────────────────────────────────────
 

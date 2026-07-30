@@ -1,12 +1,13 @@
 from fastapi.testclient import TestClient
 
+from example_api_service.config.app_config import APP_CONFIG
 from example_api_service.main_api import app
 
 client = TestClient(app)
 
 
 def test_healthcheck_returns_ok():
-    response = client.get("/healthcheck")
+    response = client.get(APP_CONFIG.HEALTH_CHECK_ROUTE)
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
 

@@ -57,6 +57,6 @@ def index() -> str:
     """
 
 
-@app.get("/healthcheck", tags=["health"])
+@app.get(APP_CONFIG.HEALTH_CHECK_ROUTE, tags=["health"])
 def healthcheck() -> dict:
     return {"status": "ok", "service": "example-api-service"}
