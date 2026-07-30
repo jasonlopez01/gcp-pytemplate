@@ -16,6 +16,7 @@ from gcp_pytemplate.main import (
     _git_config,
     _load_yaml,
     _resolve_component_paths,
+    _validate_rel_paths,
     slugify,
 )
 from gcp_pytemplate.render import render_service
@@ -212,9 +213,10 @@ def update_project(
 
     if files:
         rel_paths = [f.strip() for f in files.split(",") if f.strip()]
-        for p in rel_paths:
-            if Path(p).is_absolute() or ".." in Path(p).parts:
-                return f"Error: invalid path '{p}' — must be a relative path within the project"
+        try:
+            _validate_rel_paths(rel_paths)
+        except typer.BadParameter as e:
+            return f"Error: {e}"
     elif components:
         component_names = [c.strip() for c in components.split(",") if c.strip()]
         invalid = [c for c in component_names if c not in UPDATABLE_COMPONENTS]

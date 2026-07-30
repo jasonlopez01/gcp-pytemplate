@@ -2,6 +2,7 @@ import keyword
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
@@ -59,6 +60,32 @@ _COMPONENT_LABELS = {
     "gcp_auth": "utils/gcp_auth/",
     "logging_config": "config/logging_config.py",
 }
+
+
+def _stdin_is_tty() -> bool:
+    """questionary raises an opaque OSError instead of failing cleanly when stdin is not a terminal."""
+    try:
+        return sys.stdin.isatty()
+    except (AttributeError, ValueError):
+        return False
+
+
+def _select(message: str, choices: list[str], default: str) -> str:
+    """Prompt for one of choices, falling back to default when there is no terminal to prompt on."""
+    if not _stdin_is_tty():
+        console.print(f"[yellow]{message} not a terminal, using default '{default}'.[/yellow]")
+        return default
+    answer = questionary.select(message, choices=choices, default=default).ask()
+    if answer is None:  # interrupted
+        raise typer.Exit(1)
+    return answer
+
+
+def _confirm(message: str) -> bool:
+    """Ask for confirmation, declining when there is no terminal to prompt on."""
+    if not _stdin_is_tty():
+        return False
+    return bool(questionary.confirm(message, default=False).ask())
 
 
 def slugify(name: str) -> str:
@@ -186,6 +213,13 @@ def _resolve_component_paths(component_names: list[str], project_module: str) ->
     return paths
 
 
+def _validate_rel_paths(rel_paths: list[str]) -> None:
+    """Reject update paths that would resolve outside the target project."""
+    for p in rel_paths:
+        if Path(p).is_absolute() or ".." in Path(p).parts:
+            raise typer.BadParameter(f"Invalid path '{p}' — must be a relative path within the project")
+
+
 def _copy_from_temp(
     temp_project_root: Path,
     dest_project_root: Path,
@@ -269,18 +303,10 @@ def new(
     )
 
     if not interfaces:
-        interfaces = questionary.select(
-            "Interfaces:",
-            choices=["both", "api", "cli"],
-            default="both",
-        ).ask()
+        interfaces = _select("Interfaces:", choices=["both", "api", "cli"], default="both")
 
     if not deploy_targets:
-        deploy_targets = questionary.select(
-            "Deploy targets:",
-            choices=["both", "cloud-run", "cloud-run-jobs"],
-            default="both",
-        ).ask()
+        deploy_targets = _select("Deploy targets:", choices=["both", "cloud-run", "cloud-run-jobs"], default="both")
 
     if deploy_targets == "cloud-run" and interfaces == "cli":
         console.print("[yellow]Cloud Run requires the API interface — adding it.[/yellow]")
@@ -306,16 +332,12 @@ def new(
     project_slug = context["project_slug"]
     project_root = output_dir / project_slug
     if project_root.exists() and any(project_root.iterdir()):
-        confirmed = (
-            overwrite
-            or questionary.confirm(
-                f"Directory '{project_slug}' already exists. Overwrite?",
-                default=False,
-            ).ask()
-        )
+        confirmed = overwrite or _confirm(f"Directory '{project_slug}' already exists. Overwrite?")
         if not confirmed:
-            console.print("[yellow]Aborted.[/yellow]")
-            raise typer.Exit()
+            console.print(
+                f"[yellow]Aborted.[/yellow] '{project_slug}' already exists — pass --overwrite to replace it."
+            )
+            raise typer.Exit(1)
         shutil.rmtree(project_root)
 
     console.print(f"\n[bold]Creating[/bold] [cyan]{project_name}[/cyan] → [green]{project_slug}[/green]")
@@ -375,6 +397,7 @@ def update(
 
     if files:
         rel_paths = [f.strip() for f in files.split(",") if f.strip()]
+        _validate_rel_paths(rel_paths)
     elif components:
         component_names = [c.strip() for c in components.split(",") if c.strip()]
         invalid = [c for c in component_names if c not in UPDATABLE_COMPONENTS]
@@ -385,6 +408,12 @@ def update(
             raise typer.Exit(1)
         rel_paths = _resolve_component_paths(component_names, project_module)
     else:
+        if not _stdin_is_tty():
+            console.print(
+                "[red]Error: no terminal to prompt on — pass --components or --files "
+                f"(available components: {', '.join(UPDATABLE_COMPONENTS)}).[/red]"
+            )
+            raise typer.Exit(1)
         choices = [
             questionary.Choice(
                 title=f"{name}  ({label})",
