@@ -7,14 +7,14 @@ authors = [
     { name = "Jason Lopez", email = "jasonlopez01@gmail.com" }
 ]
 keywords = [
-    "python", 
-    "template", 
-    "project-generator", 
-    "uv", 
-    "fastapi", 
+    "python",
+    "template",
+    "project-generator",
+    "uv",
+    "fastapi",
     "typer",
-    "gcp", 
-    "cloud run", 
+    "gcp",
+    "cloud run",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
