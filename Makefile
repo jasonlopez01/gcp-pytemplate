@@ -11,7 +11,7 @@ help: ## Show available commands
 
 setup: ## Install dependencies and git hooks
 	uv sync --group dev
-	uv run pre-commit install --hook-type commit-msg
+	uv run pre-commit install --hook-type pre-commit --hook-type commit-msg
 
 install: ## Install CLI and MCP server globally as editable (source changes apply immediately)
 	uv tool install --editable ".[mcp]"

@@ -4,8 +4,11 @@ repos:
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
+      # Files under templates/ contain Jinja2 syntax and are not valid TOML/YAML until rendered.
       - id: check-yaml
+        exclude: ^src/gcp_pytemplate/templates/
       - id: check-toml
+        exclude: ^src/gcp_pytemplate/templates/
 
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v4.1.0
