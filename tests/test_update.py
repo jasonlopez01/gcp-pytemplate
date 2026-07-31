@@ -20,7 +20,6 @@ _YAML_INPUTS = {
     "gcp_region": "us-central1",
     "gcp_service_account": "sa@test-gcp-project.iam.gserviceaccount.com",
     "author_name": "Test Author",
-    "author_email": "test@example.com",
     "interfaces": "both",
     "deploy_targets": "both",
 }

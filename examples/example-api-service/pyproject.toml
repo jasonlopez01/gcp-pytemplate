@@ -10,8 +10,9 @@ name = "example-api-service"
 version = "0.1.0"
 description = "A FastAPI service deployed to Cloud Run"
 readme = "README.md"
+# Add an "email" key here if you want it published with the package metadata.
 authors = [
-    { name = "Example Author", email = "author@example.com" }
+    { name = "Example Author" }
 ]
 requires-python = ">=3.13"
 dependencies = [

@@ -13,7 +13,6 @@ BASE_CONTEXT = {
     "gcp_region": "us-central1",
     "gcp_service_account": "sa@test-gcp-project.iam.gserviceaccount.com",
     "author_name": "Test Author",
-    "author_email": "test@example.com",
 }
 
 
@@ -352,3 +351,28 @@ def test_rendered_text_keeps_lf_and_trailing_newline(tmp_path, fixture_template)
     raw = (tmp_path / "out" / "my-test-app" / "script.sh").read_bytes()
     assert b"\r\n" not in raw
     assert raw == b"#!/bin/sh\necho my-test-app\n"
+
+
+# ── Author metadata ───────────────────────────────────────────────────────────
+
+
+def test_authors_block_has_name_and_no_email(tmp_path):
+    tomllib = pytest.importorskip("tomllib")
+    parsed = tomllib.loads(_read_pyproject(tmp_path))
+    assert parsed["project"]["authors"] == [{"name": "Test Author"}]
+
+
+def test_authors_block_omitted_when_name_is_empty(tmp_path):
+    content = _read_pyproject(tmp_path, author_name="")
+    assert "authors" not in content
+    assert 'readme = "README.md"\nrequires-python' in content
+
+
+@pytest.mark.parametrize("author_name", ["Test Author", ""])
+def test_generated_pyproject_is_valid_for_hatchling(tmp_path, author_name):
+    """An empty authors entry is a hard build error, so the field must be omitted, not blank."""
+    tomllib = pytest.importorskip("tomllib")
+    content = _read_pyproject(tmp_path, author_name=author_name)
+    parsed = tomllib.loads(content)
+    for author in parsed["project"].get("authors", []):
+        assert author.get("name") or author.get("email"), "author entry must specify name or email"

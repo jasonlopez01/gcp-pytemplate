@@ -84,15 +84,28 @@ def test_return_string_contains_settings_summary(tmp_path):
     assert "interfaces" in result
 
 
-def test_resolves_author_defaults_from_git_config(tmp_path, monkeypatch):
+def test_resolves_author_name_from_git_config(tmp_path, monkeypatch):
     monkeypatch.setattr(
         "gcp_pytemplate.mcp_server._git_config",
-        lambda key: "Test Author" if key == "user.name" else "test@example.com",
+        lambda key: "Test Author" if key == "user.name" else None,
     )
     _create(tmp_path)
     data = yaml.safe_load((tmp_path / "my-service" / ".gcp-pytemplate.yaml").read_text())
     assert data["author_name"] == "Test Author"
-    assert data["author_email"] == "test@example.com"
+    assert "author_email" not in data
+
+
+def test_author_email_is_never_recorded(tmp_path, monkeypatch):
+    """git config user.email must not reach the generated project."""
+    monkeypatch.setattr(
+        "gcp_pytemplate.mcp_server._git_config",
+        lambda key: "Test Author" if key == "user.name" else "private@example.com",
+    )
+    _create(tmp_path)
+    inputs = (tmp_path / "my-service" / ".gcp-pytemplate.yaml").read_text()
+    pyproject = (tmp_path / "my-service" / "pyproject.toml").read_text()
+    assert "private@example.com" not in inputs
+    assert "private@example.com" not in pyproject
 
 
 # ── update_project ────────────────────────────────────────────────────────────

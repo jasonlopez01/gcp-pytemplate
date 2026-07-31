@@ -10,9 +10,12 @@ name = "{{ project_slug }}"
 version = "0.1.0"
 description = "{{ project_description }}"
 readme = "README.md"
+{%- if author_name %}
+# Add an "email" key here if you want it published with the package metadata.
 authors = [
-    { name = "{{ author_name }}", email = "{{ author_email }}" }
+    { name = "{{ author_name }}" }
 ]
+{%- endif %}
 requires-python = ">=3.13"
 dependencies = [
 {%- if include_api %}

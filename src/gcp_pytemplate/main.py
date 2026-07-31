@@ -196,7 +196,6 @@ def _build_context(data: dict) -> dict:
         "gcp_region": data["gcp_region"],
         "gcp_service_account": data["gcp_service_account"],
         "author_name": data.get("author_name", ""),
-        "author_email": data.get("author_email", ""),
         "include_api": include_api,
         "include_cli": include_cli,
         "include_cloud_run": include_cloud_run,
@@ -267,8 +266,7 @@ def new(
     gcp_project: str | None = typer.Option(None, help="GCP project ID (defaults to gcloud config)"),
     gcp_region: str | None = typer.Option(None, help="GCP region (defaults to gcloud config compute/region)"),
     gcp_service_account: str | None = typer.Option(None, help="GCP service account email"),
-    author_name: str | None = typer.Option(None, help="Author full name (defaults to git config user.name)"),
-    author_email: str | None = typer.Option(None, help="Author email (defaults to git config user.email)"),
+    author_name: str | None = typer.Option(None, help="Author full name (prompts, defaulting to git config user.name)"),
     interfaces: str | None = typer.Option(None, help="Interfaces to include: api, cli, or both"),
     deploy_targets: str | None = typer.Option(None, help="Deploy targets: cloud-run, cloud-run-jobs, or both"),
     output_dir: Path = typer.Option(Path.cwd(), help="Directory to create the project in"),
@@ -285,15 +283,18 @@ def new(
         gcp_region = gcp_region or data.get("gcp_region")
         gcp_service_account = gcp_service_account or data.get("gcp_service_account")
         author_name = author_name or data.get("author_name")
-        author_email = author_email or data.get("author_email")
         interfaces = interfaces or data.get("interfaces")
         deploy_targets = deploy_targets or data.get("deploy_targets")
 
     project_name = project_name or typer.prompt("Project name")
     project_description = project_description or typer.prompt("Project description")
 
-    resolved_author_name = author_name or _git_config("user.name") or "Your Name"
-    resolved_author_email = author_email or _git_config("user.email") or "you@example.com"
+    # Prompted rather than resolved silently, so the identity written into the generated
+    # pyproject.toml is always something the user saw and can clear. Without a terminal there is
+    # nobody to show it to, so nothing is assumed; the template omits authors when this is empty.
+    if author_name is None:
+        author_name = typer.prompt("Author name", default=_git_config("user.name") or "") if _stdin_is_tty() else ""
+    resolved_author_name = author_name.strip()
 
     resolved_gcp_project = gcp_project or typer.prompt("GCP project", default=_gcloud_config("project") or "")
     resolved_gcp_region = gcp_region or typer.prompt("GCP region", default=_gcloud_config("compute/region") or "")
@@ -323,7 +324,6 @@ def new(
             "gcp_region": resolved_gcp_region,
             "gcp_service_account": resolved_gcp_service_account,
             "author_name": resolved_author_name,
-            "author_email": resolved_author_email,
             "interfaces": interfaces,
             "deploy_targets": deploy_targets,
         }
@@ -351,7 +351,6 @@ def new(
         "gcp_region": resolved_gcp_region,
         "gcp_service_account": resolved_gcp_service_account,
         "author_name": resolved_author_name,
-        "author_email": resolved_author_email,
         "interfaces": interfaces,
         "deploy_targets": deploy_targets,
     }

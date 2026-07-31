@@ -10,8 +10,9 @@ name = "example-cli-job"
 version = "0.1.0"
 description = "A Typer CLI application deployed as a Cloud Run Job"
 readme = "README.md"
+# Add an "email" key here if you want it published with the package metadata.
 authors = [
-    { name = "Example Author", email = "author@example.com" }
+    { name = "Example Author" }
 ]
 requires-python = ">=3.13"
 dependencies = [

@@ -32,7 +32,6 @@ def _format_summary(
     project_name: str,
     project_description: str,
     author_name: str,
-    author_email: str,
     gcp_project: str,
     gcp_region: str,
     gcp_service_account: str,
@@ -51,8 +50,7 @@ def _format_summary(
         f"  project_name:        {project_name}\n"
         f"  project_slug:        {slug}\n"
         f"  project_description: {project_description}\n"
-        f"  author_name:         {author_name or '(empty)'}\n"
-        f"  author_email:        {author_email or '(empty)'}\n"
+        f"  author_name:         {author_name or '(none)'}\n"
         f"  gcp_project:         {gcp_project}\n"
         f"  gcp_region:          {gcp_region}\n"
         f"  gcp_service_account: {gcp_service_account}\n"
@@ -80,7 +78,6 @@ async def create_project(
     deploy_targets: str = "both",
     output_dir: str | None = None,
     author_name: str | None = None,
-    author_email: str | None = None,
     overwrite: bool = False,
     ctx: Context | None = None,
 ) -> str:
@@ -91,8 +88,8 @@ async def create_project(
     output_dir: directory to create the project in (defaults to current directory)
     overwrite: delete and replace the project directory if it already exists (destructive)
     """
-    resolved_author_name = author_name or _git_config("user.name") or ""
-    resolved_author_email = author_email or _git_config("user.email") or ""
+    # Surfaced in the elicitation summary below, so it is never baked in unseen.
+    resolved_author_name = (author_name or _git_config("user.name") or "").strip()
     out = Path(output_dir) if output_dir else Path.cwd()
 
     # Validate before prompting so bad input fails fast instead of after a confirmation round-trip.
@@ -107,7 +104,6 @@ async def create_project(
                 "interfaces": interfaces,
                 "deploy_targets": deploy_targets,
                 "author_name": resolved_author_name,
-                "author_email": resolved_author_email,
             }
         )
     except typer.BadParameter as e:
@@ -128,7 +124,6 @@ async def create_project(
             project_name=project_name,
             project_description=project_description,
             author_name=resolved_author_name,
-            author_email=resolved_author_email,
             gcp_project=gcp_project,
             gcp_region=gcp_region,
             gcp_service_account=gcp_service_account,
@@ -156,18 +151,13 @@ async def create_project(
         "gcp_region": gcp_region,
         "gcp_service_account": gcp_service_account,
         "author_name": resolved_author_name,
-        "author_email": resolved_author_email,
         "interfaces": interfaces,
         "deploy_targets": deploy_targets,
     }
     inputs_path = project_root / ".gcp-pytemplate.yaml"
     inputs_path.write_text(yaml.dump(template_inputs, default_flow_style=False, sort_keys=False))
 
-    author_display = (
-        f"{resolved_author_name} <{resolved_author_email}>"
-        if resolved_author_name or resolved_author_email
-        else "(none)"
-    )
+    author_display = resolved_author_name or "(none)"
     return (
         f"Created '{context['project_slug']}' with {len(written)} files at {project_root}\n\n"
         f"Settings used:\n"

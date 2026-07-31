@@ -52,6 +52,7 @@ You'll be prompted for:
 |---|---|---|
 | Project name | Human-readable name | — |
 | Project description | Short description | — |
+| Author name | Written to the generated `pyproject.toml`; leave blank to omit | `git config user.name` |
 | GCP project | GCP project ID | `gcloud config` |
 | GCP region | Compute region | `gcloud config` |
 | GCP service account | Service account email | placeholder |
@@ -72,6 +73,10 @@ gcp-pytemplate new \
 ```
 
 Add `--overwrite` to replace an existing project directory without the interactive prompt.
+
+No author email is collected or written. Generated projects get an `authors` entry with a name only,
+and the field is omitted entirely when no name is given, so add an `email` key by hand if you want one
+published with your package metadata.
 
 ### From a YAML file
 

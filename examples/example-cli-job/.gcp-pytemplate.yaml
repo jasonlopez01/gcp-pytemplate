@@ -4,6 +4,5 @@ gcp_project: my-gcp-project
 gcp_region: us-west2
 gcp_service_account: my-service-account@my-gcp-project.iam.gserviceaccount.com
 author_name: Example Author
-author_email: author@example.com
 interfaces: cli
 deploy_targets: cloud-run-jobs
