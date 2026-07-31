@@ -13,7 +13,7 @@
 #
 # Requirements:
 #   - gcloud CLI installed and authenticated
-#   - Cloud Run Job already deployed (run deploy_job_from_image.sh first)
+#   - Cloud Run Job already deployed (run deploy_cloud_run_job.sh first)
 #   - Deploy config file present in deploy_configs/
 
 set -euo pipefail
@@ -79,7 +79,9 @@ EXECUTE_CMD=(
 )
 
 if [[ "${HAS_ARGS}" == "true" ]]; then
-    # Pass args via env var — Procfile script processes ignore container CMD args
+    # Args travel in an env var because Procfile processes are shell-expanded and ignore
+    # container CMD args. On 'jobs execute' this flag is a per-execution override, merged with
+    # the job's existing env vars, so it does not change the deployed job definition.
     EXECUTE_CMD+=(--update-env-vars="CLI_ARGS=${JOB_ARGS[*]}")
 fi
 
