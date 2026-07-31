@@ -35,9 +35,16 @@ async def logging_middleware(request: Request, call_next: Callable[[Request], Aw
     structlog.contextvars.bind_contextvars(**ctx)
 
     start = time.perf_counter()
-    response: Response = await call_next(request)
-    duration_ms = round((time.perf_counter() - start) * 1000, 1)
+    try:
+        response: Response = await call_next(request)
+    except Exception:
+        # Without this an unhandled handler error leaves no request log at all, just the
+        # traceback from the server's own error handling.
+        duration_ms = round((time.perf_counter() - start) * 1000, 1)
+        logger.exception("request failed", duration_ms=duration_ms)
+        raise
 
+    duration_ms = round((time.perf_counter() - start) * 1000, 1)
     logger.info("request", status_code=response.status_code, duration_ms=duration_ms)
     return response
 
@@ -59,4 +66,5 @@ def index() -> str:
 
 @app.get(APP_CONFIG.HEALTH_CHECK_ROUTE, tags=["health"])
 def healthcheck() -> dict:
-    return {"status": "ok", "service": "{{ project_slug }}"}
+    # Sourced from config rather than baked in, so the response follows APP_CONFIG_FILE.
+    return {"status": "ok", "service": APP_CONFIG.APP_NAME, "env": APP_CONFIG.APP_ENV}
