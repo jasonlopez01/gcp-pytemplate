@@ -293,3 +293,62 @@ def test_no_unrendered_jinja_variables(tmp_path):
         # Allow ${...} (shell variables) but flag {{ ... }} (Jinja leftovers)
         if "{{" in content and "}}" in content:
             pytest.fail(f"Unrendered Jinja variable in {path.name}:\n{content[:200]}")
+
+
+# ── Non-text and skipped files ────────────────────────────────────────────────
+
+# A real .DS_Store starts with the "Bud1" magic and is not valid UTF-8.
+_DS_STORE_BYTES = b"\x00\x00\x00\x01Bud1\x00\x00\x10\x00\x00\x00\x08\x00\xff\xfe"
+_PNG_BYTES = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\xff\xd8\xff\xe0"
+
+
+@pytest.fixture
+def fixture_template(tmp_path):
+    """A minimal template tree standing in for the packaged one."""
+    root = tmp_path / "template"
+    (root / "src" / "{{ project_module }}").mkdir(parents=True)
+    (root / "README.md").write_text("# {{ project_name }}\n")
+    (root / "src" / "{{ project_module }}" / "__init__.py").write_text("")
+    (root / ".gitkeep").write_bytes(b"")
+    return root
+
+
+def test_ds_store_in_template_is_skipped(tmp_path, fixture_template):
+    (fixture_template / ".DS_Store").write_bytes(_DS_STORE_BYTES)
+
+    written = render_service(_context(), tmp_path / "out", template_root=fixture_template)
+
+    assert not any(p.name == ".DS_Store" for p in written)
+    assert (tmp_path / "out" / "my-test-app" / "README.md").read_text() == "# My Test App\n"
+
+
+def test_ds_store_nested_in_template_is_skipped(tmp_path, fixture_template):
+    (fixture_template / "src" / ".DS_Store").write_bytes(_DS_STORE_BYTES)
+
+    written = render_service(_context(), tmp_path / "out", template_root=fixture_template)
+
+    assert not any(p.name == ".DS_Store" for p in written)
+
+
+def test_gitkeep_is_skipped(tmp_path, fixture_template):
+    written = render_service(_context(), tmp_path / "out", template_root=fixture_template)
+
+    assert not any(p.name == ".gitkeep" for p in written)
+
+
+def test_binary_asset_is_copied_verbatim(tmp_path, fixture_template):
+    (fixture_template / "logo.png").write_bytes(_PNG_BYTES)
+
+    render_service(_context(), tmp_path / "out", template_root=fixture_template)
+
+    assert (tmp_path / "out" / "my-test-app" / "logo.png").read_bytes() == _PNG_BYTES
+
+
+def test_rendered_text_keeps_lf_and_trailing_newline(tmp_path, fixture_template):
+    (fixture_template / "script.sh").write_text("#!/bin/sh\necho {{ project_slug }}\n")
+
+    render_service(_context(), tmp_path / "out", template_root=fixture_template)
+
+    raw = (tmp_path / "out" / "my-test-app" / "script.sh").read_bytes()
+    assert b"\r\n" not in raw
+    assert raw == b"#!/bin/sh\necho my-test-app\n"
