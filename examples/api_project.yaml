@@ -6,5 +6,8 @@ project_description: A FastAPI service deployed to Cloud Run
 gcp_project: my-gcp-project
 gcp_region: us-west2
 gcp_service_account: my-service-account@my-gcp-project.iam.gserviceaccount.com
+# Set explicitly so regenerating does not bake the running user's git identity into the example.
+author_name: Example Author
+author_email: author@example.com
 interfaces: api
 deploy_targets: cloud-run

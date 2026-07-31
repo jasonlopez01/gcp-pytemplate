@@ -3,7 +3,7 @@ project_description: A FastAPI service deployed to Cloud Run
 gcp_project: my-gcp-project
 gcp_region: us-west2
 gcp_service_account: my-service-account@my-gcp-project.iam.gserviceaccount.com
-author_name: Jason Lopez
-author_email: jasonlopez01@gmail.com
+author_name: Example Author
+author_email: author@example.com
 interfaces: api
 deploy_targets: cloud-run
