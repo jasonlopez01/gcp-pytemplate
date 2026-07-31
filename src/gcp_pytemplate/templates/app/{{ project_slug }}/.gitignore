@@ -77,6 +77,12 @@ dmypy.json
 # Local History for Visual Studio Code
 .history/
 
+# Claude Code local settings
+.claude/settings.local.json
+
+# Ruff
+.ruff_cache/
+
 # Mac files
 **/.DS_Store
 
