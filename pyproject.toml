@@ -66,6 +66,13 @@ build-backend = "hatchling.build"
 [tool.hatch.version]
 source = "vcs"
 
+# Hatchling honours .gitignore, but not a user's global gitignore, so per-machine files can still
+# reach the sdist. Exclude them explicitly rather than relying on how any one clone is configured.
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/.claude",
+]
+
 # Added -n (number of concurrent tests) and --dist=loadscope (load by class) for concurrency with pytest-xdist plugin
 [tool.pytest.ini_options]
 addopts = "--maxfail=1 --verbose -s -n=auto --dist loadscope"

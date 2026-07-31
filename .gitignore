@@ -218,3 +218,6 @@ terraform.rc
 # Added:
 secrets/
 TODO
+
+# Per-machine Claude Code settings (contains local absolute paths)
+.claude/settings.local.json
