@@ -4,22 +4,22 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
-gcp-pytemplate is a CLI tool that scaffolds production-ready Python projects for Google Cloud Platform, using [uv](https://docs.astral.sh/uv/) for package management and [Cloud Native Buildpacks](https://buildpacks.io/) for containerization. With built-in uv tooling, optional FastAPI/Typer entrypoints, GCP authentication utilities.
+gcp-pytemplate is a CLI tool that scaffolds production-ready Python projects for Google Cloud Platform, using [uv](https://docs.astral.sh/uv/) for package management and [Cloud Native Buildpacks](https://buildpacks.io/) for containerization. With built-in uv tooling, optional FastAPI (API) or Typer (CLI) entrypoints, and GCP authentication utilities for Service Accounts.
 
 ## Features
 
 - 🐍 **Python env management with [UV](https://docs.astral.sh/uv/)**
-- 🔌 **Configurable interfaces** — [FastAPI (API)](https://fastapi.tiangolo.com/), [Typer (CLI)](https://typer.tiangolo.com/), or both
+- 🔌 **Configurable interfaces** - [FastAPI (API)](https://fastapi.tiangolo.com/), [Typer (CLI)](https://typer.tiangolo.com/), or both
   - Request/response validation with [Pydantic](https://docs.pydantic.dev/) across both interfaces
   - Auto-generated [OpenAPI](https://www.openapis.org/) spec and interactive docs via FastAPI
-- ⚙️ **Per-environment config** — `local`, `stage`, and `prod` for both app settings and similar deploy settings (can add more if needed)
+- ⚙️ **Per-environment config** - `local`, `stage`, and `prod` for both app settings and similar deploy settings (can add more if needed)
 - 🛠️ **Makefile with core commands** - One set of commands to test, lint, and deploy
-- 🚀 **Deployment scripts** — One-command deploys to configurable deploy targets including Cloud Run and Cloud Run Jobs
+- 🚀 **Deployment scripts** - One-command deploys to configurable deploy targets including Cloud Run and Cloud Run Jobs
 - 📋 **Structured logging** with [structlog](https://www.structlog.org/), compatible with GCP logging formats
 - ✨ **Linting and formatting** with [ruff](https://docs.astral.sh/ruff/)
 - 🧪 **Testing** with [pytest](https://docs.pytest.org/) (parallel execution via pytest-xdist)
-- 📦 **Procfile-based** process definitions for Cloud Native Buildpacks
-- 🤖 **Agent-ready** — generated projects include an `AGENTS.md` with commands, config conventions, and project layout for AI coding assistants
+- 📦 **Procfile-based** process definitions for Cloud Native Buildpacks (ie no Docker containers, still supports Docker containerization if desired)
+- 🤖 **Agent-ready** - generated projects include an `AGENTS.md` with commands, config conventions, and project layout for AI coding assistants
 
 ## Prerequisites
 
