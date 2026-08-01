@@ -112,6 +112,10 @@ indent-style = "space"
 commit_parser = "conventional"
 tag_format = "v{version}"
 build_command = "uv build"
+# Stay on 0.x while the project is alpha: a breaking change bumps the minor rather than
+# jumping to 1.0.0. Flip major_on_zero back to true when the API is ready to be committed to.
+allow_zero_version = true
+major_on_zero = false
 
 [tool.semantic_release.commit_parser_options]
 minor_tags = ["feat"]
