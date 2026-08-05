@@ -27,7 +27,21 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
+      # Built here rather than through PSR's build_command: that runs inside the PSR container,
+      # which has no uv, so it failed with exit 127. By this point PSR has created the version
+      # tag, so hatch-vcs resolves the real version rather than a .dev local one.
+      - name: Build distributions
+        if: steps.release.outputs.released == 'true'
+        run: uv build
+
       - name: Publish to PyPI
-        # Note: no credentials needed — OIDC trusted publisher handles auth
+        # Note: no credentials needed, the OIDC trusted publisher handles auth
         if: steps.release.outputs.released == 'true'
         uses: pypa/gh-action-pypi-publish@release/v1
+
+      - name: Attach distributions to the GitHub Release
+        if: steps.release.outputs.released == 'true'
+        uses: python-semantic-release/publish-action@v9
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ steps.release.outputs.tag }}

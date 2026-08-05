@@ -111,7 +111,9 @@ indent-style = "space"
 [tool.semantic_release]
 commit_parser = "conventional"
 tag_format = "v{version}"
-build_command = "uv build"
+# Deliberately no build_command. The PSR GitHub Action runs inside its own container, which has
+# no uv on PATH, so building there fails with exit 127. The workflow builds on the runner after
+# PSR has created the tag instead; see .github/workflows/release.yml.
 # Stay on 0.x while the project is alpha: a breaking change bumps the minor rather than
 # jumping to 1.0.0. Flip major_on_zero back to true when the API is ready to be committed to.
 allow_zero_version = true
