@@ -376,3 +376,35 @@ def test_generated_pyproject_is_valid_for_hatchling(tmp_path, author_name):
     parsed = tomllib.loads(content)
     for author in parsed["project"].get("authors", []):
         assert author.get("name") or author.get("email"), "author entry must specify name or email"
+
+
+# ── .jinja suffix ─────────────────────────────────────────────────────────────
+
+
+def test_jinja_suffix_is_stripped_from_rendered_path(tmp_path, fixture_template):
+    (fixture_template / "pyproject.toml.jinja").write_text('name = "{{ project_slug }}"\n')
+
+    render_service(_context(), tmp_path / "out", template_root=fixture_template)
+
+    out = tmp_path / "out" / "my-test-app"
+    assert (out / "pyproject.toml").read_text() == 'name = "my-test-app"\n'
+    assert not (out / "pyproject.toml.jinja").exists()
+
+
+def test_suffixed_file_still_honours_exclusion_rules(tmp_path, fixture_template):
+    """Rules are written against final paths, so the suffix is stripped before they are checked."""
+    (fixture_template / "src" / "{{ project_module }}" / "main_api.py.jinja").write_text("# api\n")
+
+    written = render_service(_context(include_api=False), tmp_path / "out", template_root=fixture_template)
+
+    assert not any("main_api" in p.name for p in written)
+
+
+def test_packaged_template_has_no_detectable_pyproject():
+    """A real pyproject.toml here gets scraped by GitHub's dependency graph and fails to parse."""
+    import importlib.resources as pkg_resources
+
+    ref = pkg_resources.files("gcp_pytemplate").joinpath("templates/app/{{ project_slug }}")
+    with pkg_resources.as_file(ref) as root:
+        assert (root / "pyproject.toml.jinja").is_file()
+        assert not (root / "pyproject.toml").exists()

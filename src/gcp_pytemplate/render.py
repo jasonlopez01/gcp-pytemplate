@@ -7,6 +7,11 @@ import jinja2
 # Never copied into a generated project: OS and editor metadata can turn up anywhere in the tree.
 _SKIP_FILENAMES = frozenset({".gitkeep", ".DS_Store"})
 
+# Stripped from the rendered path, so a template file can be named to avoid being mistaken for a
+# real one. pyproject.toml uses this: left under its real name, GitHub's dependency graph picks it
+# up as a pip manifest and fails on the Jinja2 syntax.
+_TEMPLATE_SUFFIX = ".jinja"
+
 # Files/directories to exclude based on context flags.
 # Each rule is (path_fragment, required_flag).
 _EXCLUSION_RULES = [
@@ -45,6 +50,10 @@ def _render_tree(context: dict, output_dir: Path, template_root: Path) -> list[P
         # Render any Jinja variables in the file path itself
         rel_str = str(src_path.relative_to(template_root))
         rendered_rel = jinja2.Template(rel_str).render(**context)
+
+        # Strip before the exclusion check so rules can be written against the final path.
+        if rendered_rel.endswith(_TEMPLATE_SUFFIX):
+            rendered_rel = rendered_rel[: -len(_TEMPLATE_SUFFIX)]
 
         if _should_skip(rendered_rel, context):
             continue

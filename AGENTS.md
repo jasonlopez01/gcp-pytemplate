@@ -62,6 +62,8 @@ uv run gcp-pytemplate update <project-path> --components logging_config
 
 **Templates are excluded from ruff.** Files under `src/gcp_pytemplate/templates/` contain Jinja2 syntax and are not valid Python — ruff is configured to skip them. Don't run linting on template files.
 
+**A `.jinja` suffix on a template file is stripped when rendered.** `pyproject.toml.jinja` renders to `pyproject.toml`. Use this for any template whose real filename would make external tooling try to parse it: under its real name, GitHub's dependency graph picked up the template `pyproject.toml` as a pip manifest and failed on the Jinja2 syntax. The suffix is stripped before the exclusion rules in `render.py` are evaluated, so those rules are written against the final path.
+
 **Keep documentation in sync.** When making changes that affect functionality or interfaces (CLI flags, MCP tools, Python version support, make targets, project layout), update `README.md` and `AGENTS.md` to match. The Prerequisites, Usage, and Development sections of `README.md` and the Commands table in `AGENTS.md` are the primary places to check.
 
 **Commit style: conventional commits.** Pre-commit hooks enforce the format. Prefixes and their effect on versioning and the changelog:
