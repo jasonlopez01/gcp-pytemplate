@@ -171,8 +171,7 @@ def _build_context(data: dict) -> dict:
     project_slug = slugify(project_name)
     project_module = project_slug.replace("-", "_")
 
-    # A name made only of punctuation slugifies to "", which would resolve the project root back to
-    # the output directory itself. A leading digit produces an unimportable module name.
+    # An empty slug would resolve the project root to the output directory itself.
     if not project_module.isidentifier() or keyword.iskeyword(project_module):
         raise typer.BadParameter(
             f"Invalid project_name {project_name!r} — must start with a letter and contain at least "
@@ -289,9 +288,8 @@ def new(
     project_name = project_name or typer.prompt("Project name")
     project_description = project_description or typer.prompt("Project description")
 
-    # Prompted rather than resolved silently, so the identity written into the generated
-    # pyproject.toml is always something the user saw and can clear. Without a terminal there is
-    # nobody to show it to, so nothing is assumed; the template omits authors when this is empty.
+    # Prompted rather than read silently from git config, so the user sees what gets written.
+    # Left empty without a terminal; the template omits the authors field when it is blank.
     if author_name is None:
         author_name = typer.prompt("Author name", default=_git_config("user.name") or "") if _stdin_is_tty() else ""
     resolved_author_name = author_name.strip()

@@ -40,8 +40,15 @@ dependencies = [
     "typer>=0.24.1",
 ]
 
+# Sidebar links on the PyPI project page.
+[project.urls]
+Homepage = "https://github.com/jasonlopez01/gcp-pytemplate"
+Repository = "https://github.com/jasonlopez01/gcp-pytemplate"
+Issues = "https://github.com/jasonlopez01/gcp-pytemplate/issues"
+Changelog = "https://github.com/jasonlopez01/gcp-pytemplate/blob/main/CHANGELOG.md"
+
 [project.optional-dependencies]
-# Capped below 2.0: mcp 2.x dropped mcp.server.fastmcp, which mcp_server.py imports.
+# mcp 2.x dropped mcp.server.fastmcp, which mcp_server.py imports.
 mcp = ["mcp>=1.0.0,<2.0.0"]
 
 [dependency-groups]
@@ -112,11 +119,10 @@ indent-style = "space"
 [tool.semantic_release]
 commit_parser = "conventional"
 tag_format = "v{version}"
-# Deliberately no build_command. The PSR GitHub Action runs inside its own container, which has
-# no uv on PATH, so building there fails with exit 127. The workflow builds on the runner after
-# PSR has created the tag instead; see .github/workflows/release.yml.
-# Stay on 0.x while the project is alpha: a breaking change bumps the minor rather than
-# jumping to 1.0.0. Flip major_on_zero back to true when the API is ready to be committed to.
+# No build_command: the PSR action runs in a container without uv, so release.yml builds on the
+# runner after PSR has tagged.
+
+# Stay on 0.x while alpha: breaking changes bump the minor. Set major_on_zero = true for 1.0.
 allow_zero_version = true
 major_on_zero = false
 

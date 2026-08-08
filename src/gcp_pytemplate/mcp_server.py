@@ -88,11 +88,11 @@ async def create_project(
     output_dir: directory to create the project in (defaults to current directory)
     overwrite: delete and replace the project directory if it already exists (destructive)
     """
-    # Surfaced in the elicitation summary below, so it is never baked in unseen.
+    # Shown in the elicitation summary below, so it is never baked in unseen.
     resolved_author_name = (author_name or _git_config("user.name") or "").strip()
     out = Path(output_dir) if output_dir else Path.cwd()
 
-    # Validate before prompting so bad input fails fast instead of after a confirmation round-trip.
+    # Validate before prompting so bad input fails fast.
     try:
         context = _build_context(
             {
@@ -111,7 +111,7 @@ async def create_project(
 
     project_root = out / context["project_slug"]
 
-    # render_service writes files in place, so without this an existing project is silently clobbered.
+    # render_service writes in place, so without this an existing project is silently clobbered.
     replacing_existing = project_root.exists() and any(project_root.iterdir())
     if replacing_existing and not overwrite:
         return (

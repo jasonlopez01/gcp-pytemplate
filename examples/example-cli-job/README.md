@@ -76,3 +76,7 @@ Both have per-environment variants: `local`, `stage`, and `prod`.
 `.env` files are useful for specifying service and deployment configuration. Having a set of files make it easy to see and change values across environments - like certain constants, deployment settings, etc. Exactly the kinf of thing we want to be version-tracked and reviewable in PRs.
 
 Any secrets needed should be managed via a secret manager (e.g., GCP Secret Manager) and fetched at runtime, rather than stored in static configuration files. Instead of specifying an API key or database password in a `.env` file, specify the secret's URI, ID, or resource path so it can be securely fetched at runtime. If secrets in a local file are needed, a gitignored file like `secrets.env` or `secrets.prod.env` could be added.
+
+---
+
+Generated with [gcp-pytemplate](https://github.com/jasonlopez01/gcp-pytemplate).

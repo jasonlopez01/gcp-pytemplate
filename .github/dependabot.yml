@@ -1,21 +1,14 @@
 version: 2
 
 updates:
-  # Only the tool itself is listed here.
-  #
-  # Deliberately excluded:
-  #   src/gcp_pytemplate/templates/  Jinja2 sources; the pyproject.toml there is not valid TOML
-  #                                  until rendered, so nothing can resolve its dependencies.
-  #   examples/                      generated output. Its pyproject.toml files must keep matching
-  #                                  what `make generate-examples` produces, so a bump there would
-  #                                  desync them from the template.
+  # Root only. templates/ is Jinja2 and examples/ is generated output that must keep matching
+  # `make generate-examples`.
   - package-ecosystem: "uv"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
-    # chore is non-releasable under [tool.semantic_release], so a dependency bump never cuts a
-    # release on its own. Change to "fix" if you would rather they ship as patch releases.
+    # chore is non-releasable, so a bump never cuts a release on its own.
     commit-message:
       prefix: "chore"
     groups:

@@ -1,5 +1,7 @@
 # gcp-pytemplate
 
+[![Tests](https://github.com/jasonlopez01/gcp-pytemplate/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/jasonlopez01/gcp-pytemplate/actions/workflows/tests.yml?query=branch%3Amain)
+[![PyPI](https://img.shields.io/pypi/v/gcp-pytemplate)](https://pypi.org/project/gcp-pytemplate/)
 [![Supported Python versions](https://img.shields.io/badge/python-3.10_%7C_3.11_%7C_3.12_%7C_3.13_%7C_3.14-blue?labelColor=grey&color=blue)](https://pypi.org/project/gcp-pytemplate/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 

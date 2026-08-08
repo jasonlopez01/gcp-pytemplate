@@ -79,9 +79,8 @@ EXECUTE_CMD=(
 )
 
 if [[ "${HAS_ARGS}" == "true" ]]; then
-    # Args travel in an env var because Procfile processes are shell-expanded and ignore
-    # container CMD args. On 'jobs execute' this flag is a per-execution override, merged with
-    # the job's existing env vars, so it does not change the deployed job definition.
+    # Args travel in an env var because Procfile processes ignore container CMD args. On
+    # 'jobs execute' this is a per-execution override, not a change to the job definition.
     EXECUTE_CMD+=(--update-env-vars="CLI_ARGS=${JOB_ARGS[*]}")
 fi
 

@@ -15,10 +15,10 @@ GCP_METADATA_TIMEOUT = 5
 
 
 def _fetch_metadata(path: str) -> str:
-    """Read a value from the GCP metadata server.
+    """Read a value from the GCP metadata server, falling back if it is unreachable.
 
-    This module is imported at startup, so a metadata server that is slow or unreachable must not
-    take the whole app down. Falls back to DEFAULT_STR_VALUE instead of raising.
+    This module is imported at startup, so a slow or missing metadata server must not
+    take the app down.
     """
     req = urllib.request.Request(f"{GCP_METADATA_BASE}/{path}", headers=GCP_METADATA_HEADERS)
     try:
@@ -57,8 +57,7 @@ def load_deployed_env_data() -> DeployedEnvData:
     if not service_id:
         return DeployedEnvData(IS_DEPLOYED=False)
 
-    # Not every runtime that sets a service name also sets a revision (Cloud Functions gen1, for one),
-    # so fall back rather than passing None into a str field.
+    # Not every runtime that sets a service name also sets a revision.
     return DeployedEnvData(
         IS_DEPLOYED=True,
         SERVICE_ID=service_id,
@@ -72,8 +71,7 @@ def load_deployed_env_data() -> DeployedEnvData:
 # Load in GCP env data if deployed and export values as env variables
 GCP_ENV_DATA = load_deployed_env_data()
 
-# Only export when actually deployed, and never overwrite a value the environment already set;
-# otherwise local runs stamp "not-set" over real GCP_PROJECT/GCP_REGION values.
+# Only when deployed, and never overwriting values the environment already set.
 if GCP_ENV_DATA.IS_DEPLOYED:
     for _key, _value in GCP_ENV_DATA.model_dump(exclude_none=True).items():
         os.environ.setdefault(_key, str(_value))

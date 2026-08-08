@@ -39,8 +39,7 @@ shift
 case "${1:-}" in
     --health)
         METHOD="GET"
-        # Resolved from the app config after the deploy config is loaded, since the route is configurable.
-        REQUEST_PATH=""
+        REQUEST_PATH=""  # resolved from the app config once the deploy config is loaded
         ;;
     "" | -*)
         echo "Error: expected --health or '<METHOD> <PATH>', got '${1:-}'."
@@ -72,8 +71,7 @@ source "${DEPLOY_CONFIG_FILE}"
 
 # ── Resolve the health check route ────────────────────────────────────────────
 
-# The API serves its health check at HEALTH_CHECK_ROUTE, so read it from the same app config the
-# deployment uses rather than assuming the default. App configs are plain KEY="value" lines.
+# The health check route is configurable, so read it from the app config the deployment uses.
 if [[ -z "${REQUEST_PATH}" ]]; then
     APP_CONFIG_PATH="${PROJECT_ROOT}/src/example_api_service/config/app_configs/${APP_CONFIG:-}"
     if [[ -f "${APP_CONFIG_PATH}" ]]; then
