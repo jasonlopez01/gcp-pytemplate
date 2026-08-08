@@ -7,9 +7,10 @@ import jinja2
 # Never copied into a generated project: OS and editor metadata can turn up anywhere in the tree.
 _SKIP_FILENAMES = frozenset({".gitkeep", ".DS_Store"})
 
-# Stripped from the rendered path, so a template file can be named to avoid being mistaken for a
-# real one. pyproject.toml uses this: left under its real name, GitHub's dependency graph picks it
-# up as a pip manifest and fails on the Jinja2 syntax.
+# pip byte-compiles the installed template tree, so __pycache__ appears next to the templates.
+_SKIP_DIRNAMES = frozenset({"__pycache__"})
+
+# Stripped from the rendered path, so a template can be named to avoid tooling parsing it as real.
 _TEMPLATE_SUFFIX = ".jinja"
 
 # Files/directories to exclude based on context flags.
@@ -46,6 +47,8 @@ def _render_tree(context: dict, output_dir: Path, template_root: Path) -> list[P
     for src_path in sorted(template_root.rglob("*")):
         if src_path.is_dir() or src_path.name in _SKIP_FILENAMES:
             continue
+        if not _SKIP_DIRNAMES.isdisjoint(src_path.parts):
+            continue
 
         # Render any Jinja variables in the file path itself
         rel_str = str(src_path.relative_to(template_root))
@@ -70,14 +73,12 @@ def _render_tree(context: dict, output_dir: Path, template_root: Path) -> list[P
             continue
 
         try:
-            # keep_trailing_newline: Jinja drops the final newline by default, which leaves
-            # every rendered file without one and fails the generated project's own formatter.
+            # keep_trailing_newline: Jinja drops the final newline, which fails ruff format.
             rendered_content = jinja2.Template(template_text, keep_trailing_newline=True).render(**context)
         except jinja2.TemplateError as e:
             raise RuntimeError(f"Template error in {src_path.name}: {e}") from e
 
-        # newline="" keeps LF endings in rendered shell scripts and Procfiles on Windows hosts,
-        # where the default would translate them to CRLF and break the Linux container image.
+        # newline="" keeps LF endings on Windows hosts, where the default would write CRLF.
         dest_path.write_text(rendered_content, encoding="utf-8", newline="")
         written.append(dest_path)
 

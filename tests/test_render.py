@@ -408,3 +408,15 @@ def test_packaged_template_has_no_detectable_pyproject():
     with pkg_resources.as_file(ref) as root:
         assert (root / "pyproject.toml.jinja").is_file()
         assert not (root / "pyproject.toml").exists()
+
+
+def test_pycache_in_template_tree_is_not_copied(tmp_path, fixture_template):
+    """pip byte-compiles the installed template tree; those artefacts must not reach output."""
+    cache = fixture_template / "src" / "{{ project_module }}" / "__pycache__"
+    cache.mkdir()
+    (cache / "__init__.cpython-313.pyc").write_bytes(b"\x00\x00\x00\x00compiled{{")
+
+    written = render_service(_context(), tmp_path / "out", template_root=fixture_template)
+
+    assert not any(".pyc" in p.name for p in written)
+    assert not any("__pycache__" in p.parts for p in written)
