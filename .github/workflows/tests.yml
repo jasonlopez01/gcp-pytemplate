@@ -30,3 +30,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: uv sync --group dev
       - run: uv run pytest
+
+  # Catches packaging problems that uv.lock hides, such as an extra that only resolves locally.
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true  # hatch-vcs needs tags to resolve the package version
+      - uses: astral-sh/setup-uv@v5
+      - run: make smoke

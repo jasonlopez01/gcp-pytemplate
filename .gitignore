@@ -221,3 +221,6 @@ TODO
 
 # Per-machine Claude Code settings (contains local absolute paths)
 .claude/settings.local.json
+
+# Local smoke-test venv (make smoke)
+.smoke/

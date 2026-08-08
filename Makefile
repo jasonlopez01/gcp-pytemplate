@@ -1,4 +1,4 @@
-.PHONY: init lint test test-all version generate-examples release-dry-run changelog help
+.PHONY: init lint test test-all smoke version generate-examples release-dry-run changelog help
 
 PYTHON_VERSIONS := 3.10 3.11 3.12 3.13 3.14
 
@@ -32,6 +32,29 @@ test-all: ## Run tests against all supported Python versions
 		echo "=== Python $$v ==="; \
 		uv run --python $$v pytest || exit 1; \
 	done
+
+# Installs with pip, not uv sync, so dependencies resolve fresh rather than from uv.lock.
+smoke: ## Build and smoke test a clean install of the wheel, including the [mcp] extra
+	rm -rf .smoke
+	uv build
+	python3 -m venv .smoke
+	.smoke/bin/pip install --quiet "$$(ls -t dist/*.whl | head -1)[mcp]"
+	.smoke/bin/gcp-pytemplate --version
+	.smoke/bin/python -c "import asyncio; from gcp_pytemplate.mcp_server import mcp; \
+		t = sorted(x.name for x in asyncio.run(mcp.list_tools())); print('mcp tools:', t); \
+		assert 'create_project' in t, 'MCP tools missing'"
+	.smoke/bin/gcp-pytemplate new --project-name 'Smoke Test' --project-description ci \
+		--gcp-project my-gcp-project --gcp-region us-west2 \
+		--gcp-service-account sa@my-gcp-project.iam.gserviceaccount.com \
+		--author-name CI --interfaces both --deploy-targets both \
+		--output-dir .smoke/out --overwrite
+	@test -f .smoke/out/smoke-test/pyproject.toml || { echo "ERROR: pyproject.toml not generated"; exit 1; }
+	@if find .smoke/out -name '*.jinja' | grep -q .; then echo "ERROR: .jinja leaked into output"; exit 1; fi
+	@if find .smoke/out \( -name '*.pyc' -o -name '__pycache__' \) | grep -q .; then \
+		echo "ERROR: compiled artefacts leaked into output"; exit 1; fi
+	@# -I skips binaries, which can contain matching byte sequences
+	@if grep -rlI '{{' .smoke/out >/dev/null 2>&1; then echo "ERROR: unrendered Jinja in output"; exit 1; fi
+	@echo "smoke test passed"
 
 # ── Release ───────────────────────────────────────────────────────────────────
 
