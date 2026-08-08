@@ -41,12 +41,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-mcp = ["mcp>=1.0.0"]
+# Capped below 2.0: mcp 2.x dropped mcp.server.fastmcp, which mcp_server.py imports.
+mcp = ["mcp>=1.0.0,<2.0.0"]
 
 [dependency-groups]
 dev = [
     "commitizen>=4.1.0",
-    "mcp>=1.0.0",
+    "mcp>=1.0.0,<2.0.0",  # keep in step with the [mcp] extra above
     "pre-commit>=4.0.0",
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
