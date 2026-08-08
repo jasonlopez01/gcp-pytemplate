@@ -1,6 +1,54 @@
 # CHANGELOG
 
 
+## v0.1.1 (2026-08-08)
+
+### Bug Fixes
+
+- Cap the mcp dependency below 2.0
+  ([`bf3cbdd`](https://github.com/jasonlopez01/gcp-pytemplate/commit/bf3cbdd0433c59793a81ed2d654881154ac3577a))
+
+mcp 2.0.0 dropped mcp.server.fastmcp, which mcp_server.py imports, so a fresh `pip install
+  gcp-pytemplate[mcp]` resolved to 2.0.0 and failed at import with ModuleNotFoundError. The 0.1.0
+  release shipped with this broken.
+
+It was invisible locally because uv.lock pinned a working 1.x, so only users installing from PyPI
+  hit it. Cap the extra and the dev group at <2.0.0, keeping them in step.
+
+Verified against a freshly built wheel: pip resolves mcp 1.29.0 and all four tools load. Migrating
+  to the 2.x API is a separate piece of work.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+- Stop compiled artefacts leaking into generated projects
+  ([`f7b2933`](https://github.com/jasonlopez01/gcp-pytemplate/commit/f7b29335ddcc7a294b7f8d3a96c348516c91653e))
+
+pip byte-compiles every .py it installs, including the template tree, so an installed copy grows
+  __pycache__ directories beside the templates. The renderer copied those straight through, and a
+  project scaffolded from the published wheel came out with 15 stray .pyc files.
+
+Skip any path containing __pycache__.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+### Documentation
+
+- Add badges, PyPI project links and template attribution
+  ([`3408d07`](https://github.com/jasonlopez01/gcp-pytemplate/commit/3408d07aa3bf1be8fddd0996646ba82b31c56973))
+
+Adds a Tests status badge and a PyPI version badge to the README, and a [project.urls] table so the
+  PyPI page gets sidebar links to the repo, issues and changelog. 0.1.0 published with no project
+  URLs at all.
+
+Generated projects now end their README with a line crediting gcp-pytemplate. Kept in the footer
+  rather than the header so it does not sit above the user's own project description.
+
+Also trims the longer explanatory comments added recently down to the point rather than the full
+  reasoning behind each change.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+
 ## v0.1.0 (2026-08-06)
 
 ### Bug Fixes
