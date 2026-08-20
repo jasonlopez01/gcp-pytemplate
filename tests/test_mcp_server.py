@@ -7,7 +7,21 @@ import yaml
 
 pytest.importorskip("mcp")
 
-from gcp_pytemplate.mcp_server import create_project, get_version, list_components, update_project  # noqa: E402
+from mcp.server.mcpserver import (
+    AcceptedElicitation,
+    CancelledElicitation,
+    DeclinedElicitation,
+)
+from mcp.shared.exceptions import MCPError
+from mcp.types import METHOD_NOT_FOUND
+
+from gcp_pytemplate.mcp_server import (
+    _Confirmation,
+    create_project,
+    get_version,
+    list_components,
+    update_project,
+)
 
 _VALID_INPUTS = dict(
     project_name="My Service",
@@ -106,6 +120,56 @@ def test_author_email_is_never_recorded(tmp_path, monkeypatch):
     pyproject = (tmp_path / "my-service" / "pyproject.toml").read_text()
     assert "private@example.com" not in inputs
     assert "private@example.com" not in pyproject
+
+
+# ── create_project elicitation ────────────────────────────────────────────────
+
+# create_project only ever calls ctx.elicit(), so a stub carrying the result is enough to drive
+# every branch. The results themselves are the real SDK types, so a change to their shape fails
+# here rather than in a client.
+
+
+class _StubContext:
+    def __init__(self, result):
+        self._result = result
+        self.messages: list[str] = []
+
+    async def elicit(self, message, schema):
+        self.messages.append(message)
+        if isinstance(self._result, Exception):
+            raise self._result
+        return self._result
+
+
+def test_elicitation_accepted_creates_project(tmp_path):
+    ctx = _StubContext(AcceptedElicitation(data=_Confirmation(confirmed=True)))
+    result = _create(tmp_path, ctx=ctx)
+    assert "my-service" in result
+    assert (tmp_path / "my-service").is_dir()
+    assert "gcp_project" in ctx.messages[0]  # the summary reached the user before anything was written
+
+
+@pytest.mark.parametrize(
+    "elicitation",
+    [
+        AcceptedElicitation(data=_Confirmation(confirmed=False)),
+        DeclinedElicitation(),
+        CancelledElicitation(),
+    ],
+    ids=["unconfirmed", "declined", "cancelled"],
+)
+def test_elicitation_without_consent_writes_nothing(tmp_path, elicitation):
+    result = _create(tmp_path, ctx=_StubContext(elicitation))
+    assert result == "Project creation cancelled."
+    assert not (tmp_path / "my-service").exists()
+
+
+def test_client_without_elicitation_support_still_creates_project(tmp_path):
+    """Clients that can't elicit raise rather than answering; creation proceeds anyway."""
+    ctx = _StubContext(MCPError(code=METHOD_NOT_FOUND, message="Method not found"))
+    result = _create(tmp_path, ctx=ctx)
+    assert "my-service" in result
+    assert (tmp_path / "my-service").is_dir()
 
 
 # ── update_project ────────────────────────────────────────────────────────────
