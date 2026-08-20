@@ -224,3 +224,7 @@ TODO
 
 # Local smoke-test venv (make smoke)
 .smoke/
+
+# Examples are generated output and the generator emits no lockfile. A committed one drifts and
+# raises security alerts for dependencies nothing here installs. The root uv.lock stays tracked.
+examples/*/uv.lock
