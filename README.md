@@ -186,6 +186,10 @@ Releases are fully automated. When commits are merged to `main`, [python-semanti
 
 If only non-releasable commits are present (`chore:`, `ci:`, etc.) no release is created.
 
+`CHANGELOG.md` has a `<!-- version list -->` marker under the heading and PSR inserts each release
+below it. Remove the marker and releases still tag and publish, but the changelog silently stops
+updating.
+
 To preview what the next release would look like without making any changes:
 
 ```bash
