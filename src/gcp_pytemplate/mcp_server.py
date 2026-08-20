@@ -4,8 +4,8 @@ from pathlib import Path
 
 import typer
 import yaml
-from mcp.server.fastmcp import Context, FastMCP
-from mcp.shared.exceptions import McpError
+from mcp.server.mcpserver import Context, MCPServer
+from mcp.shared.exceptions import MCPError
 from pydantic import BaseModel
 
 from gcp_pytemplate.main import (
@@ -21,7 +21,7 @@ from gcp_pytemplate.main import (
 )
 from gcp_pytemplate.render import render_service
 
-mcp = FastMCP("gcp-pytemplate")
+mcp = MCPServer("gcp-pytemplate")
 
 
 class _Confirmation(BaseModel):
@@ -136,8 +136,8 @@ async def create_project(
             result = await ctx.elicit(summary, _Confirmation)
             if result.action != "accept" or not result.data.confirmed:
                 return "Project creation cancelled."
-        except McpError:
-            pass  # client doesn't support elicitation — proceed silently
+        except MCPError:
+            pass  # client doesn't support elicitation, proceed silently
 
     if replacing_existing:
         shutil.rmtree(project_root)
