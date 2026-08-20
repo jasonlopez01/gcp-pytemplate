@@ -19,6 +19,10 @@ updates:
       # to <3.0.0 to make room for the bump, rather than treating it as a constraint.
       - dependency-name: "mcp"
         versions: [">=2.0.0"]
+      # python-semantic-release caps rich at <15, so a rich 15 bump has no solution and the
+      # updater errors out. Drop this once PSR widens its pin.
+      - dependency-name: "rich"
+        versions: [">=15.0.0"]
     groups:
       python-dependencies:
         patterns:
